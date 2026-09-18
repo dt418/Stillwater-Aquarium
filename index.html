@@ -1,0 +1,13 @@
+<!doctype html><html lang="vi" data-fit="fill" data-motion="host"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stillwater 2 — Living Riverscape</title><link rel="icon" href="data:,"><link rel="stylesheet" href="style.css"></head><body>
+<main id="habitat" aria-label="Bể thủy sinh tương tác"><canvas id="scene" tabindex="-1"></canvas><div id="loading"><span>STILLWATER</span><small>Đang chuẩn bị bể thủy sinh 3D…</small></div></main>
+<div id="hint">STILLWATER <span>Di chuột để tương tác · Nhấp để cho cá ăn</span></div>
+<button id="settings" aria-label="Cài đặt bể cá">⚙</button><output id="stats" hidden aria-label="Hiệu năng"></output>
+<dialog id="panel"><header><small>A LIVING RIVERSCAPE</small><h1>Stillwater <span>02</span></h1><p>Chuyển động tự nhiên. Nhịp sống của riêng bạn.</p></header>
+<label for="frameRate">Tốc độ khung hình<select id="frameRate"><option value="60">60 FPS</option><option value="120">120 FPS</option><option value="144">144 FPS</option><option value="165">165 FPS</option><option value="240">240 FPS</option><option value="360">Theo màn hình · tối đa 360</option></select></label>
+<label for="renderScale">Độ phân giải dựng hình <output id="renderScaleValue"></output></label><input type="range" id="renderScale" min="50" max="125" step="5">
+<label for="light">Ánh sáng <output id="lightValue"></output></label><input type="range" id="light" min="50" max="140" step="5">
+<label for="follow">Cá phản ứng với chuột<input type="checkbox" id="follow"></label><label for="showStats">Hiện FPS thực tế<input type="checkbox" id="showStats"></label>
+<p class="note">FPS thực tế phụ thuộc GPU, màn hình và trình phát. Giảm độ phân giải dựng hình nếu chuyển động chưa mượt.</p>
+<div class="actions"><button id="feed">Cho cá ăn</button><button id="pause">Tạm dừng</button></div><footer><button id="reset">Mặc định</button><button id="close">Trở về bể cá</button></footer>
+<p class="credit">Adapted from Desktop Habitats · Chase Lean<br>Three.js · Poly Haven textures</p></dialog>
+<script src="controls.js"></script><script src="aquarium.js"></script></body></html>

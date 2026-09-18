@@ -1,0 +1,13 @@
+{
+  "name": "stillwater-aquarium",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node scenes/riverscape/tests/render-policy.mjs && node scenes/riverscape/tests/fish-behavior.mjs && node scenes/riverscape/tests/plant-budget.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}

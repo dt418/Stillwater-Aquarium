@@ -1,0 +1,51 @@
+{
+  "frameRate": {
+    "type": "dropdown",
+    "value": 5,
+    "text": "Frame rate target",
+    "items": [
+      "60 FPS",
+      "120 FPS",
+      "144 FPS",
+      "165 FPS",
+      "240 FPS",
+      "Native refresh (max 360)"
+    ]
+  },
+  "renderScale": {
+    "type": "slider",
+    "min": 50,
+    "max": 125,
+    "tick": 5,
+    "value": 90,
+    "text": "Render resolution (%)"
+  },
+  "light": {
+    "type": "slider",
+    "min": 50,
+    "max": 140,
+    "tick": 5,
+    "value": 100,
+    "text": "Light (%)"
+  },
+  "follow": {
+    "type": "checkbox",
+    "value": true,
+    "text": "Fish react to cursor"
+  },
+  "showStats": {
+    "type": "checkbox",
+    "value": false,
+    "text": "Show measured FPS"
+  },
+  "paused": {
+    "type": "checkbox",
+    "value": false,
+    "text": "Pause"
+  },
+  "feed": {
+    "type": "button",
+    "value": "Feed",
+    "text": "Feed fish"
+  }
+}
