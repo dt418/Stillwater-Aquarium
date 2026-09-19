@@ -289,7 +289,7 @@ async function surface(loader, name, repeat, color, film, turf = "#0b1e08") {
   );
 }
 
-function rockGeometry(seed, detail = 112) {
+function rockGeometry(seed, detail = 64) {
   const geometry = new THREE.SphereGeometry(
     1,
     detail,
@@ -369,8 +369,8 @@ function rockGeometry(seed, detail = 112) {
 function branchGeometry(points, baseRadius, tipRadius, seed) {
   const curve = new THREE.CatmullRomCurve3(points);
   const length = curve.getLength();
-  const rows = Math.ceil(length * 30),
-    cols = 96;
+  const rows = Math.ceil(length * 18),
+    cols = 48;
   const positions = [],
     uv = [],
     indices = [],
@@ -641,7 +641,7 @@ export async function createEnvironment(scene) {
     }
   };
 
-  const ground = new THREE.PlaneGeometry(24, 18, 200, 140);
+  const ground = new THREE.PlaneGeometry(24, 18, 120, 84);
   ground.rotateX(-Math.PI / 2);
   const position = ground.attributes.position;
   const groundColors = [];
@@ -751,7 +751,7 @@ export async function createEnvironment(scene) {
   const grit = new THREE.InstancedMesh(
     new THREE.IcosahedronGeometry(1, 0),
     gritMaterial,
-    4200,
+    2600,
   );
   for (let i = 0; i < grit.count; i++) {
     const [x, z] = sedimentSpot(-9, 9, -4, 4, 0.35);

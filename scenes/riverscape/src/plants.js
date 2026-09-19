@@ -141,7 +141,8 @@ const BEDS = [
 const grassHeight = (x) => 5.4 + 4.0 * smoothstep(2.0, 7.5, Math.abs(x));
 
 export function createPlants(scene, {
-  backgroundDensity = 0.7, backgroundRows = 20, backgroundCols = 2, animatedShadows = true,
+  backgroundDensity = 0.7, backgroundRows = 20, backgroundCols = 2,
+  animatedShadows = true, castShadows = true,
 } = {}) {
   const batch = new GeometryBatch();
   const density = Number.isFinite(backgroundDensity) ? Math.max(0, Math.min(1, backgroundDensity)) : 0.7;
@@ -250,7 +251,7 @@ export function createPlants(scene, {
   const mesh = new THREE.Mesh(batch.geometry(), foliageMaterial());
   mesh.name = 'Aquatic planting';
   mesh.customDepthMaterial = foliageDepth({ animated: animatedShadows });
-  mesh.castShadow = true;
+  mesh.castShadow = castShadows;
   mesh.receiveShadow = true;
   scene.add(mesh);
   stats.vertices = mesh.geometry.attributes.position.count;

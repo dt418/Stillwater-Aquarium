@@ -1,18 +1,27 @@
 // Settings are available before the renderer starts, including early Lively callbacks.
 (()=>{
- const defaults={frameRate:360,renderScale:90,light:100,follow:true,showStats:false,paused:false};
+ const defaults={frameRate:360,renderScale:75,light:100,follow:true,showStats:false,paused:false};
  const prefs={...defaults};const rates=[60,120,144,165,240,360];
+ function frameRateValue(value,fromLively=false){
+  if(typeof value==='string'){
+   const label=value.match(/\d+/)?.[0];
+   if(label&&rates.includes(Number(label)))return Number(label);
+  }
+  const n=Number(value);
+  if(fromLively&&Number.isInteger(n)&&n>=0&&n<rates.length)return rates[n];
+  return rates.includes(n)?n:defaults.frameRate;
+ }
  function normalize(name,value){
   if(['follow','showStats','paused'].includes(name))return value===true||value==='true';
   const n=Number(value);if(!Number.isFinite(n))return defaults[name];
-  if(name==='frameRate')return rates.includes(n)?n:360;
+  if(name==='frameRate')return frameRateValue(value);
   if(name==='renderScale')return Math.max(50,Math.min(125,n));
   if(name==='light')return Math.max(50,Math.min(140,n));
  }
  try{const saved=JSON.parse(localStorage.getItem('stillwater3d')||'{}');for(const k in defaults)if(k in saved)prefs[k]=normalize(k,saved[k])}catch{}
  window.stillwaterPreferences=prefs;
  const panel=document.getElementById('panel'),stats=document.getElementById('stats');
- function sync(){for(const key in prefs){const e=document.getElementById(key);if(!e)continue;if(e.type==='checkbox')e.checked=prefs[key];else e.value=prefs[key];const out=document.getElementById(key+'Value');if(out)out.textContent=prefs[key]+'%'}stats.hidden=!prefs.showStats;document.getElementById('pause').textContent=prefs.paused?'Tiếp tục':'Tạm dừng';if(prefs.paused)stats.textContent='Đã tạm dừng';}
+ function sync(){for(const key in prefs){const e=document.getElementById(key);if(!e)continue;if(e.type==='checkbox')e.checked=prefs[key];else e.value=String(prefs[key]);const out=document.getElementById(key+'Value');if(out)out.textContent=prefs[key]+'%'}const rate=document.getElementById('frameRateStatus');if(rate)rate.textContent=prefs.frameRate===360?'Theo màn hình':`${prefs.frameRate} FPS`;stats.hidden=!prefs.showStats;document.getElementById('pause').textContent=prefs.paused?'Tiếp tục':'Tạm dừng';if(prefs.paused)stats.textContent='Đã tạm dừng';}
  window.stillwaterSet=(name,value)=>{
   if(name==='feed'){window.stillwaterApply?.('feed');return}
   if(!(name in defaults))return;
@@ -21,10 +30,10 @@
   window.stillwaterApply?.(name);
  };
  window.livelyPropertyListener=(name,val)=>{
-  if(name==='frameRate')val=rates[Number(val)]??360;
+  if(name==='frameRate')val=frameRateValue(val,true);
   window.stillwaterSet(name,val);
  };
- for(const key in defaults){const e=document.getElementById(key);e?.addEventListener('input',()=>window.stillwaterSet(key,e.type==='checkbox'?e.checked:e.value))}
+ for(const key in defaults){const e=document.getElementById(key);if(!e)continue;const event=e.tagName==='SELECT'||e.type==='checkbox'?'change':'input';e.addEventListener(event,()=>window.stillwaterSet(key,e.type==='checkbox'?e.checked:e.value))}
  document.getElementById('settings').onclick=()=>panel.showModal();
  document.getElementById('close').onclick=()=>panel.close();
  document.getElementById('feed').onclick=()=>window.stillwaterSet('feed');

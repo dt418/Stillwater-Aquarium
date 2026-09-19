@@ -1,0 +1,25 @@
+{
+  "method": "20-frame synchronous one-pixel WebGL readback",
+  "environment": "Chromium 153, ANGLE SwiftShader, Linux headless",
+  "viewportCssPixels": [640, 360],
+  "renderScalePercent": 75,
+  "before": {
+    "meanServiceMs": 4182.715,
+    "medianServiceMs": 3344.45,
+    "p95ServiceMs": 9038.56,
+    "meanTriangles": 1920154.4,
+    "meanDrawCalls": 42
+  },
+  "after": {
+    "meanServiceMs": 2161.015,
+    "medianServiceMs": 2031.3,
+    "p95ServiceMs": 2545.44,
+    "meanTriangles": 1072858,
+    "meanDrawCalls": 39.9
+  },
+  "change": {
+    "meanServiceTimePercent": -48.34,
+    "meanTrianglesPercent": -44.13
+  },
+  "note": "Comparative software-renderer measurement; not a physical Windows GPU FPS claim."
+}

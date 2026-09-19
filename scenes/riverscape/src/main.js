@@ -155,6 +155,7 @@ async function start() {
   const { obstacles, landmarks } = await createEnvironment(scene);
   const plants = createPlants(scene, {
     ...settings, animatedShadows: profile !== "reference",
+    castShadows: settings.plantShadows,
   });
   const food = createFood(scene, { thickets: plants.thickets });
   const fish = createFishSchool(scene, {

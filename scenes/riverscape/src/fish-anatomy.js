@@ -74,8 +74,10 @@ const ROW_DENSITY = [
   [-0.265, 2.0],
   [HYPURAL_X, 2.4],
 ];
-const BODY_ROWS = 84;
-const BODY_COLUMNS = 62;
+// The fish are small on a desktop. This mesh keeps the silhouette smooth while
+// avoiding sub-pixel triangles that only consume fill and vertex bandwidth.
+const BODY_ROWS = 56;
+const BODY_COLUMNS = 40;
 
 // The eyeball is a flattened lens seated in the orbit: 39% of head length across but
 // only a fifth of that thick, as a small characin's eye is. The body surface takes on
@@ -103,8 +105,8 @@ const MOUTH = { cornerX: 0.322, cornerY: -0.0175, tipX: 0.3495, tipY: -0.0035 };
 // Fin ray counts from the species' fin formulae: dorsal ii,9; anal iii,20;
 // pectoral i,11; pelvic i,7; caudal 19 principal rays. The adipose fin has none.
 const FIN_RAYS = { 1: 19, 2: 11, 3: 23, 4: 12, 5: 12, 6: 8, 12: 0 };
-const MEMBRANE_STEPS = 8;
-const RAY_SUBDIVISIONS = 4;
+const MEMBRANE_STEPS = 5;
+const RAY_SUBDIVISIONS = 2;
 
 // Scale rows for a 40 mm fish: 34 in the lateral series, 11 from the dorsal midline to
 // the ventral. Visible only when a scale covers more than a pixel.

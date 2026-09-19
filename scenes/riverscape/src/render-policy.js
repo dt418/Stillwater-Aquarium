@@ -2,10 +2,11 @@
 // profile reproduces the uploaded rendering/density settings for local A/B checks.
 export const PROFILES = Object.freeze({
   fluid: Object.freeze({
-    name: 'fluid', resolution: 1, batteryResolution: 0.75,
-    shadowSize: 1024, shadowHz: 20, batteryShadowHz: 10,
-    aoSamples: 4, backgroundDensity: 0.7, backgroundRows: 20,
+    name: 'fluid', resolution: 1, batteryResolution: 0.7,
+    shadowSize: 768, shadowHz: 12, batteryShadowHz: 6,
+    aoSamples: 2, backgroundDensity: 0.58, backgroundRows: 16,
     backgroundCols: 2, powerPreference: 'high-performance',
+    samples: 2, plantShadows: false,
   }),
   balanced: Object.freeze({
     name: 'balanced',
@@ -19,6 +20,8 @@ export const PROFILES = Object.freeze({
     backgroundRows: 20,
     backgroundCols: 2,
     powerPreference: 'low-power',
+    samples: 4,
+    plantShadows: true,
   }),
   reference: Object.freeze({
     name: 'reference',
@@ -30,6 +33,8 @@ export const PROFILES = Object.freeze({
     backgroundRows: 30,
     backgroundCols: 6,
     powerPreference: 'high-performance',
+    samples: 4,
+    plantShadows: true,
   }),
 });
 
@@ -46,9 +51,9 @@ export function renderSettings({
       (onBattery ? budget.batteryResolution : budget.resolution),
     referenceResolution,
     shadowHz: onBattery ? budget.batteryShadowHz : budget.shadowHz,
-    // The leaf shader uses quarter-sample coverage for translucent tissue. Keep 4x
-    // MSAA and the HDR format: changing either would be a much larger visual change.
-    samples: 4,
+    // Fluid mode trades a little edge quality for substantially lower bandwidth.
+    // Other profiles retain the upstream 4x MSAA foliage coverage.
+    samples: budget.samples,
   };
 }
 

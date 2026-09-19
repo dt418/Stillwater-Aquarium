@@ -1,0 +1,38 @@
+name: Build wallpaper
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - build.mjs
+      - package.json
+      - package-lock.json
+      - scenes/riverscape/src/**
+      - vendor/**
+      - .github/workflows/build.yml
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+      - name: Commit generated offline bundle
+        run: |
+          if git diff --quiet -- aquarium.js scenes/riverscape/src/texture-assets.js; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add aquarium.js scenes/riverscape/src/texture-assets.js
+          git commit -m "Build optimized wallpaper [skip ci]"
+          git push

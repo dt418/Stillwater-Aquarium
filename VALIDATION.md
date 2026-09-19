@@ -9,6 +9,8 @@
   spacing, gliding, startle propagation and food competition checks passed.
 - Plant budgets: rear geometry reduced while foreground geometry is preserved.
 - JavaScript syntax and JSON checked.
+- FPS selection checked through the on-page select and Lively callbacks supplied as
+  dropdown index, numeric rate and label text.
 
 These are correctness tests, not measurements of 120+ FPS on physical hardware.
 
@@ -32,5 +34,14 @@ A preview is included. The preview is a render of this package, not an upstream 
 
 Choose the monitor's actual high refresh rate in Windows. Use Native refresh in
 this wallpaper and enable Show measured FPS. If below target, reduce Render
-resolution from 90% to 75% or 60%. Browser/host scheduling, GPU and monitor limits
+resolution from 75% to 65% or 55%. Browser/host scheduling, GPU and monitor limits
 still apply. No FPS is claimed merely because a menu value was selected.
+
+## Optimization measurement
+
+The same 20-frame synchronous WebGL benchmark was run before and after the fluid
+profile changes at 640×360 CSS pixels and 75% render scale using Chromium 153 with
+ANGLE SwiftShader. Mean service time fell from 4182.72 ms to 2161.01 ms (48.3% lower),
+and submitted triangles fell from 1,920,154 to 1,072,858 per measured frame (44.1%
+lower). Software rendering is deliberately slow; these figures compare revisions and
+do not predict FPS on the user's Windows GPU. See performance-baseline.json.

@@ -73,5 +73,11 @@ for (const refresh of [60,120,144,165,240,360]) {
  assert(Math.abs(native.frames.length-refresh*10)<=1, `Native refresh ${refresh}: ${native.frames.length}`);
  assert(native.frames.every(f=>f.dt<=0.1));native.loop.dispose();
 }
-const fluid=renderSettings({profile:'fluid'});assert.equal(fluid.shadowSize,1024);assert.equal(fluid.powerPreference,'high-performance');
+const fluid=renderSettings({profile:'fluid'});
+assert.equal(fluid.shadowSize,768);
+assert.equal(fluid.shadowHz,12);
+assert.equal(fluid.samples,2);
+assert.equal(fluid.aoSamples,2);
+assert.equal(fluid.plantShadows,false);
+assert.equal(fluid.powerPreference,'high-performance');
 console.log('PASS: high refresh pacing and native refresh at 60/120/144/165/240/360 Hz (simulated clock, not GPU benchmark)');
