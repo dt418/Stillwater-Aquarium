@@ -53,36 +53,25 @@ const strandPosition = /* glsl */ `
 // Submerged leaves show almost no specular reflection: leaf tissue and water have
 // nearly the same refractive index, so what reaches the eye is diffuse reflection
 // and light transmitted through the thin blade.
-export function foliageMaterial({ simple = false } = {}) {
-  const material = simple
-    ? new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      roughness: 0.75,
-      side: THREE.DoubleSide,
-      vertexColors: true,
-      alphaToCoverage: true,
-    })
-    : new THREE.MeshPhysicalMaterial({
-      color: 0xffffff,
-      roughness: 0.58,
-      metalness: 0,
-      specularIntensity: 0.07,
-      side: THREE.DoubleSide,
-      vertexColors: true,
-      alphaToCoverage: true,
-    });
+export function foliageMaterial() {
+  const material = new THREE.MeshPhysicalMaterial({
+    color: 0xffffff,
+    roughness: 0.58,
+    metalness: 0,
+    specularIntensity: 0.07,
+    side: THREE.DoubleSide,
+    vertexColors: true,
+    alphaToCoverage: true,
+  });
   material.onBeforeCompile = (shader) => {
     shader.vertexShader = strandVertex + shader.vertexShader;
     shader.vertexShader = shader.vertexShader
       .replace("#include <beginnormal_vertex>", strandNormal)
       .replace(
         "#include <begin_vertex>",
-        simple
-          ? strandPosition.replace("leafUv = uv; leafPosition = position;", "")
-          : `${strandPosition}
+        `${strandPosition}
       leafUv = uv; leafPosition = position;`,
       );
-    if (simple) return;
     shader.vertexShader =
       "varying vec2 leafUv; varying vec3 leafPosition;\n" + shader.vertexShader;
     shader.fragmentShader =
@@ -130,7 +119,7 @@ export function foliageMaterial({ simple = false } = {}) {
       `,
     });
   };
-  material.customProgramCacheKey = () => simple ? "aquatic-leaves-simple-v1" : "aquatic-leaves-v2";
+  material.customProgramCacheKey = () => "aquatic-leaves-v2";
   return material;
 }
 

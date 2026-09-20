@@ -39,10 +39,10 @@ export const PROFILES = Object.freeze({
 });
 
 export function createAdaptiveScaleController({
-  minScale = 0.5,
+  minScale = 0.75,
   step = 0.05,
-  slowMs = 20,
-  fastMs = 14,
+  slowMs = 38,
+  fastMs = 24,
   slowFrames = 30,
   fastFrames = 300,
 } = {}) {
@@ -97,8 +97,6 @@ export function renderSettings({
     referenceResolution,
     animatedShadows: !intelFluid && budget.name !== 'reference',
     plantDistanceLod: intelFluid,
-    simpleMaterials: intelFluid,
-    disableShadows: intelFluid,
     shadowSize: intelFluid ? 512 : budget.shadowSize,
     shadowHz: onBattery ? budget.batteryShadowHz : (intelFluid ? 6 : budget.shadowHz),
     // Fluid mode trades a little edge quality for substantially lower bandwidth.

@@ -264,18 +264,17 @@ function mossLayer(material, film, turf) {
 
 // A young film of algae is olive and thin; established turf is dark green. The film on
 // sand is browner (diatoms) than on stone and wood.
-async function surface(loader, name, repeat, color, film, turf = "#0b1e08", simple = false) {
-  const map = await loader.loadAsync(textureAssets[`${name}_diff.jpg`]);
+async function surface(loader, name, repeat, color, film, turf = "#0b1e08") {
+  const [map, normalMap] = await Promise.all([
+    loader.loadAsync(textureAssets[`${name}_diff.jpg`]),
+    loader.loadAsync(textureAssets[`${name}_nor_gl.jpg`]),
+  ]);
   map.colorSpace = THREE.SRGBColorSpace;
-  map.wrapS = map.wrapT = THREE.RepeatWrapping;
-  map.repeat.set(...repeat);
-  map.anisotropy = simple ? 2 : 8;
-  if (simple)
-    return new THREE.MeshStandardMaterial({ map, color, roughness: 0.96, vertexColors: true });
-  const normalMap = await loader.loadAsync(textureAssets[`${name}_nor_gl.jpg`]);
-  normalMap.wrapS = normalMap.wrapT = THREE.RepeatWrapping;
-  normalMap.repeat.set(...repeat);
-  normalMap.anisotropy = 8;
+  for (const texture of [map, normalMap]) {
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(...repeat);
+    texture.anisotropy = 8;
+  }
   return mossLayer(
     new THREE.MeshStandardMaterial({
       map,
@@ -553,19 +552,15 @@ function frondGeometry() {
 
 // Fronds stand where the turf is dense. They grow up toward the light more than straight
 // off the surface, lean at random, and are picked by weighted sampling so the count is fixed.
-function plantFronds(scene, groups, { simple = false } = {}) {
+function plantFronds(scene, groups) {
   const total = groups.reduce((sum, group) => sum + group.count, 0);
   const material = new THREE.MeshStandardMaterial({
     vertexColors: true,
     roughness: 0.95,
     side: THREE.DoubleSide,
   });
-  if (!simple) {
-    material.onBeforeCompile = (shader) => waterLitShader(shader);
-    material.customProgramCacheKey = () => "moss-frond-v1";
-  } else {
-    material.customProgramCacheKey = () => "moss-frond-simple-v1";
-  }
+  material.onBeforeCompile = (shader) => waterLitShader(shader);
+  material.customProgramCacheKey = () => "moss-frond-v1";
   const fronds = new THREE.InstancedMesh(frondGeometry(), material, total);
   const object = new THREE.Object3D(),
     up = new THREE.Vector3(),
@@ -597,12 +592,13 @@ function plantFronds(scene, groups, { simple = false } = {}) {
   fronds.receiveShadow = true;
   scene.add(fronds);
 }
-export async function createEnvironment(scene, { simpleMaterials = false } = {}) {
+
+export async function createEnvironment(scene) {
   const loader = new THREE.TextureLoader();
   const [rockMaterial, woodMaterial, sandMaterial] = await Promise.all([
-    surface(loader, "rock_boulder_dry", [1.8, 1.4], 0x62665d, "#2e4315", undefined, simpleMaterials),
-    surface(loader, "rough_wood", [2.1, 1.4], 0xc3ad8e, "#334a16", undefined, simpleMaterials),
-    surface(loader, "sand_01", [10, 6], 0xf4e5c8, "#5a5a26", "#23401a", simpleMaterials),
+    surface(loader, "rock_boulder_dry", [1.8, 1.4], 0x62665d, "#2e4315"),
+    surface(loader, "rough_wood", [2.1, 1.4], 0xc3ad8e, "#334a16"),
+    surface(loader, "sand_01", [10, 6], 0xf4e5c8, "#5a5a26", "#23401a"),
   ]);
   rockMaterial.normalScale.set(0.85, 0.85);
   woodMaterial.roughness = 0.86;
@@ -808,7 +804,7 @@ export async function createEnvironment(scene, { simpleMaterials = false } = {})
     { samples: woodSamples, count: 1600 },
     { samples: rockSamples, count: 800, scale: 0.5 },
     { samples: sandSamples, count: 80, scale: 0.6 },
-  ], { simple: simpleMaterials });
+  ]);
   return { obstacles, landmarks };
 }
 
