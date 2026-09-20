@@ -408,18 +408,21 @@ function rotateAboutY(v, angle) {
 
 export function createFishSchool(
   scene,
-  { obstacles = [], landmarks = [], thickets = [], food = null } = {},
+  { count = COUNT, obstacles = [], landmarks = [], thickets = [], food = null } = {},
 ) {
+  const fishCount = Number.isFinite(Number(count))
+    ? THREE.MathUtils.clamp(Math.round(Number(count)), 8, 48)
+    : COUNT;
   const random = randomGenerator(583137);
   const range = (min, max) => min + random() * (max - min);
   const exponential = (mean) => -mean * Math.log(1 - random());
   const geometry = makeAnatomy();
   const swimAttribute = new THREE.InstancedBufferAttribute(
-    new Float32Array(COUNT * 4),
+    new Float32Array(fishCount * 4),
     4,
   );
   const finPhaseAttribute = new THREE.InstancedBufferAttribute(
-    new Float32Array(COUNT), 1,
+    new Float32Array(fishCount), 1,
   );
   swimAttribute.setUsage(THREE.DynamicDrawUsage);
   finPhaseAttribute.setUsage(THREE.DynamicDrawUsage);
@@ -434,8 +437,8 @@ export function createFishSchool(
   applySwimming(skinMaterial);
   applySwimming(finMaterial);
   applySwimming(depthMaterial, false);
-  const bodies = new THREE.InstancedMesh(geometry.body, skinMaterial, COUNT);
-  const membranes = new THREE.InstancedMesh(geometry.fins, finMaterial, COUNT);
+  const bodies = new THREE.InstancedMesh(geometry.body, skinMaterial, fishCount);
+  const membranes = new THREE.InstancedMesh(geometry.fins, finMaterial, fishCount);
   bodies.name = "Silver-blue freshwater fish";
   membranes.name = "Attached translucent fish fins";
   bodies.castShadow = true;
@@ -468,7 +471,7 @@ export function createFishSchool(
   let startled = 0;
   let escapes = 0;
   const initialPositions = [];
-  const fish = Array.from({ length: COUNT }, (_, id) => {
+  const fish = Array.from({ length: fishCount }, (_, id) => {
     const band = id % 6;
     const position = new THREE.Vector3();
     do {
@@ -1680,10 +1683,10 @@ export function createFishSchool(
         maximumSpeed = Math.max(maximumSpeed, speed);
       }
       return {
-        count: COUNT,
+        count: fishCount,
         states,
         twitching,
-        averageSpeed: totalSpeed / COUNT,
+        averageSpeed: totalSpeed / fishCount,
         maximumSpeed,
         pointerResponses: startled,
         escapes,

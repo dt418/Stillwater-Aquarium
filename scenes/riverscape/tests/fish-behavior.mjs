@@ -22,6 +22,16 @@ const insideTank = (p) =>
   p.y <= BOUNDS.maxY &&
   p.z >= BOUNDS.minZ &&
   p.z <= BOUNDS.maxZ;
+const customScene = new THREE.Scene();
+const customSchool = createFishSchool(customScene, { count: 12 });
+assert.equal(customSchool.fish.length, 12, "Fish count should control school population");
+assert.equal(customSchool.getTelemetry().count, 12, "Telemetry should report configured fish count");
+assert.equal(
+  customScene.getObjectByName("Silver-blue freshwater fish").count,
+  12,
+  "Instanced fish mesh should match configured population",
+);
+customSchool.dispose();
 
 // Two undisturbed minutes: individuals cross the tank, alternate strokes with glides,
 // stay apart, investigate the planting, and face into the current during short rests.

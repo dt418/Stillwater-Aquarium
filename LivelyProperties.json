@@ -38,6 +38,14 @@
     "value": 100,
     "text": "Light (%)"
   },
+  "fishCount": {
+    "type": "slider",
+    "min": 8,
+    "max": 48,
+    "tick": 4,
+    "value": 24,
+    "text": "Fish count"
+  },
   "follow": {
     "type": "checkbox",
     "value": true,

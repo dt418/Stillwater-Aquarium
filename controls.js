@@ -2,7 +2,7 @@
 (()=>{
  const statsPositions=['top-left','top-right','bottom-left','bottom-right'];
  const profiles=['fluid','balanced','reference'];
- const defaults={frameRate:360,renderScale:65,light:100,profile:'fluid',follow:true,showStats:false,statsPosition:'bottom-right',paused:false};
+ const defaults={frameRate:360,renderScale:65,light:100,fishCount:24,profile:'fluid',follow:true,showStats:false,statsPosition:'bottom-right',paused:false};
  const prefs={...defaults};const rates=[60,120,144,165,240,360];
  function frameRateValue(value,fromLively=false){
   if(typeof value==='string'){
@@ -33,12 +33,13 @@
   if(name==='frameRate')return frameRateValue(value);
   if(name==='renderScale')return Math.max(50,Math.min(125,n));
   if(name==='light')return Math.max(50,Math.min(140,n));
+  if(name==='fishCount')return Math.round(Math.max(8,Math.min(48,n)));
  }
  try{const saved=JSON.parse(localStorage.getItem('stillwater3d')||'{}');if(saved&&typeof saved==='object'&&!Array.isArray(saved))for(const k in defaults)if(k in saved)prefs[k]=normalize(k,saved[k])}catch{}
  window.stillwaterPreferences=prefs;
  const panel=document.getElementById('panel'),stats=document.getElementById('stats');
  function syncTaskbarInset(){const display=window.screen;const taskbar=display&&Number.isFinite(display.height)&&Number.isFinite(display.availHeight)?Math.max(0,display.height-display.availHeight):0;document.documentElement.style.setProperty('--stats-bottom',`${20+taskbar}px`);}
- function sync(){for(const key in prefs){const e=document.getElementById(key);if(!e)continue;if(e.type==='checkbox')e.checked=prefs[key];else e.value=String(prefs[key]);const out=document.getElementById(key+'Value');if(out)out.textContent=prefs[key]+'%'}stats.dataset.position=prefs.statsPosition;const rate=document.getElementById('frameRateStatus');if(rate)rate.textContent=prefs.frameRate===360?'Theo màn hình':`${prefs.frameRate} FPS`;stats.hidden=!prefs.showStats;document.getElementById('pause').textContent=prefs.paused?'Tiếp tục':'Tạm dừng';if(prefs.paused)stats.textContent='Đã tạm dừng';}
+ function sync(){for(const key in prefs){const e=document.getElementById(key);if(!e)continue;if(e.type==='checkbox')e.checked=prefs[key];else e.value=String(prefs[key]);const out=document.getElementById(key+'Value');if(out)out.textContent=key==='fishCount'?prefs[key]:prefs[key]+'%'}stats.dataset.position=prefs.statsPosition;const rate=document.getElementById('frameRateStatus');if(rate)rate.textContent=prefs.frameRate===360?'Theo màn hình':`${prefs.frameRate} FPS`;stats.hidden=!prefs.showStats;document.getElementById('pause').textContent=prefs.paused?'Tiếp tục':'Tạm dừng';if(prefs.paused)stats.textContent='Đã tạm dừng';}
  window.stillwaterSet=(name,value)=>{
   if(name==='feed'){window.stillwaterApply?.('feed');return}
   if(name==='reload'){location.reload();return}

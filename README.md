@@ -25,6 +25,7 @@ khi cảnh đã ổn định có ý nghĩa hơn thời điểm vừa mở.
 
 - 24 cá 3D: thân/vây chuyển động, phản sáng, lượn rồi lướt, khám phá không gian,
   tránh nhau, phản ứng với tốc độ di chuột và tranh thức ăn.
+- Có thể chỉnh số lượng cá từ 8 đến 48 trong Settings; mặc định 24. Số lượng cao hơn làm tăng chi phí CPU/GPU vì cá vẫn tránh nhau và phản ứng độc lập.
 - Cây thủy sinh biến dạng theo dòng nước; đá, lũa, cát dùng texture màu/normal map.
 - Ánh sáng HDR nội bộ được tone-map về màn hình SDR; đây không phải xuất HDR10.
 - Bóng đổ, độ sâu, sương nước, hạt lơ lửng, vật liệu và lớp rêu từ cảnh gốc.

@@ -21,8 +21,8 @@ let paused =
   matchMedia("(prefers-reduced-motion: reduce)").matches;
 const query = new URLSearchParams(location.search);
 const wallpaper = document.documentElement.dataset.motion === "host";
-const prefs = window.stillwaterPreferences;
 const profile = prefs.profile || "fluid";
+const fishCount = prefs.fishCount || 24;
 if (query.get("still") === "1") paused = true;
 let onBattery = false;
 let intelGPU = false;
@@ -166,6 +166,7 @@ async function start() {
   });
   const food = createFood(scene, { thickets: plants.thickets });
   const fish = createFishSchool(scene, {
+    count: fishCount,
     obstacles,
     landmarks,
     thickets: plants.thickets,
@@ -404,7 +405,7 @@ async function start() {
   paused = prefs.paused || paused;
   window.stillwaterApply = (name) => {
     if (name === 'frameRate') window.habitatRate(prefs.frameRate);
-    if (name === 'profile') location.reload();
+    if (name === 'profile' || name === 'fishCount') location.reload();
     if (name === 'paused') { paused = prefs.paused; loop.setPaused(paused); }
     if (name === 'follow' && !prefs.follow) pointer = null;
     if (name === 'renderScale') resize();
@@ -414,7 +415,7 @@ async function start() {
   // Properties may arrive while textures and geometry are still loading.
   for (const name of ['frameRate','paused','renderScale','light','follow']) window.stillwaterApply(name);
   window.habitatStats = () => ({
-    ready, foodCount: food.pellets?.length, profile, intelGPU, onBattery, resolution: settings.resolution,
+    ready, foodCount: food.pellets?.length, profile, fishCount, intelGPU, onBattery, resolution: settings.resolution,
     framebuffer: [target.width, target.height], samples: target.samples, aoSamples: settings.aoSamples,
     shadowSize: settings.shadowSize,
     shadowHz: Number.isFinite(settings.shadowHz) ? settings.shadowHz : "per-frame",

@@ -6,6 +6,7 @@ const defaults = {
   frameRate: 360,
   renderScale: 65,
   light: 100,
+  fishCount: 24,
   profile: "fluid",
   follow: true,
   showStats: false,
@@ -70,6 +71,10 @@ context.window.stillwaterSet("profile", "balanced");
 assert.equal(elements.get("profile").value, "balanced");
 context.window.livelyPropertyListener("profile", 2);
 assert.equal(context.window.stillwaterPreferences.profile, "reference");
+context.window.stillwaterSet("fishCount", 52);
+assert.equal(context.window.stillwaterPreferences.fishCount, 48);
+context.window.stillwaterSet("fishCount", 7);
+assert.equal(context.window.stillwaterPreferences.fishCount, 8);
 assert.equal(typeof context.window.livelyPropertyListener, "function");
 elements.get("reload").onclick();
 assert.equal(reloads, 1);
