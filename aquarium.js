@@ -3920,16 +3920,16 @@ ${gV}`).replace("#include <color_fragment>",`
         #include <color_fragment>
         vec3 mossFuzz = vec3(0.0);
         if (vMoss > 0.02) {
-          float mossFine = mossNoise(vWaterPosition * 9.0) * 0.6 + mossNoise(vWaterPosition * 27.0) * 0.4;
-          gMoss = smoothstep(0.07, 0.5, vMoss + (mossFine - 0.5) * 0.45);
-          gMossColor = mix(mossFilm, mossTurf, smoothstep(0.15, 0.85, vMoss)) * (0.72 + 0.9 * mossFine);
+          float mossFine = mossNoise(vWaterPosition * 6.0) * 0.65 + mossNoise(vWaterPosition * 18.0) * 0.35;
+          gMoss = smoothstep(0.06, 0.48, vMoss + (mossFine - 0.5) * 0.3);
+          gMossColor = mix(mossFilm, mossTurf, smoothstep(0.15, 0.85, vMoss)) * (0.74 + 0.76 * mossFine);
           // Growth lies in the same shade as the surface it grows on: the pit of a stone,
           // a split in the bark, the sand under the canopy.
           #ifdef USE_COLOR
             gMossColor *= vColor;
           #endif
           diffuseColor.rgb = mix(diffuseColor.rgb, gMossColor, gMoss);
-          mossFuzz = vec3(mossFine - 0.5, mossNoise(vWaterPosition * 31.0 + 7.0) - 0.5, fract(mossFine * 7.0) - 0.5);
+          mossFuzz = vec3(mossFine - 0.5, mossNoise(vWaterPosition * 20.0 + 7.0) - 0.5, mossNoise(vWaterPosition * 12.0 + 13.0) - 0.5);
         }
       `).replace("#include <roughnessmap_fragment>",`#include <roughnessmap_fragment>
 roughnessFactor = mix(roughnessFactor, 1.0, gMoss);`).replace("#include <normal_fragment_maps>",`
