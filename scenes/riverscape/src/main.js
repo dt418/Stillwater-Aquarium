@@ -369,6 +369,17 @@ async function start() {
     }
   }
   let time = 0, lastShadowTime = -Infinity, renderedFrames = 0, shadowFrames = 0;
+  const gpuTimerExt = gl.getExtension("EXT_disjoint_timer_query_webgl2");
+  let gpuTimerQuery = null;
+  function pollGpuTime() {
+    if (!gpuTimerExt || !gpuTimerQuery ||
+        !gl.getQuery(gpuTimerExt.QUERY_RESULT_AVAILABLE, gpuTimerQuery)) return null;
+    const disjoint = gl.getParameter(gpuTimerExt.GPU_DISJOINT_EXT);
+    const nanoseconds = gl.getQuery(gpuTimerExt.QUERY_RESULT, gpuTimerQuery);
+    gl.deleteQuery(gpuTimerQuery);
+    gpuTimerQuery = null;
+    return disjoint ? null : nanoseconds / 1e6;
+  }
   let ready = false;
   const collectFrameStats = prefs.showStats || query.get("diagnostics") === "1";
   function renderFrame(dt, now) {
@@ -387,7 +398,10 @@ async function start() {
     }
     if (pointer && now - lastPointerTime > 60)
       pointer.velocity.multiplyScalar(Math.exp(-dt * 12));
-    if (adaptiveScale.update(dt * 1000, profile === "fluid" && intelGPU)) resize();
+    const gpuMs = pollGpuTime();
+    if (gpuMs !== null &&
+        adaptiveScale.update(gpuMs, profile === "fluid" && intelGPU && Boolean(gpuTimerExt)))
+      resize();
     const refreshShadow = forceShadows || time - lastShadowTime + 1e-7 >= 1 / settings.shadowHz;
     renderer.shadowMap.needsUpdate = refreshShadow;
     if (refreshShadow) {
@@ -396,10 +410,18 @@ async function start() {
       shadowFrames++;
     }
     if (collectFrameStats) renderer.info.reset();
+    if (gpuTimerExt && !gpuTimerQuery) {
+      const queryObject = gl.createQuery();
+      if (queryObject) {
+        gpuTimerQuery = queryObject;
+        gl.beginQuery(gpuTimerExt.TIME_ELAPSED_EXT, gpuTimerQuery);
+      }
+    }
     renderer.setRenderTarget(target);
     renderer.render(scene, camera);
     renderer.setRenderTarget(null);
     renderer.render(postScene, postCamera);
+    if (gpuTimerQuery) gl.endQuery(gpuTimerExt.TIME_ELAPSED_EXT);
     renderedFrames++;
     if (collectFrameStats)
       window.stillwaterMeter?.(now, { framebuffer: [target.width, target.height], calls: renderer.info.render.calls });
@@ -426,7 +448,8 @@ async function start() {
   for (const name of ['frameRate','paused','renderScale','light','follow']) window.stillwaterApply(name);
   window.habitatStats = () => ({
     ready, foodCount: food.pellets?.length, profile, fishCount, intelGPU, onBattery, resolution: settings.resolution,
-    adaptiveScale: adaptiveScale.scale, animatedShadows: settings.animatedShadows,
+    adaptiveScale: adaptiveScale.scale, adaptiveTimer: Boolean(gpuTimerExt),
+    animatedShadows: settings.animatedShadows,
     framebuffer: [target.width, target.height], samples: target.samples, aoSamples: settings.aoSamples,
     shadowSize: settings.shadowSize,
     shadowHz: Number.isFinite(settings.shadowHz) ? settings.shadowHz : "per-frame",
@@ -434,7 +457,7 @@ async function start() {
     drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles,
     plants: { ...plants.stats }, loop: loop.state,
   });
-  // Diagnostics are opt-in: no timing queries, synchronization or arrays in normal use.
+  // Diagnostics remain opt-in; normal rendering only polls an asynchronous GPU timer.
   if (query.get("diagnostics") === "1") {
     const { installDiagnostics } = await import("./diagnostics.js");
     installDiagnostics({ renderer, loop, renderFrame, stats: window.habitatStats });
