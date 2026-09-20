@@ -25,6 +25,7 @@ const prefs = window.stillwaterPreferences;
 const profile = prefs.profile || "fluid";
 if (query.get("still") === "1") paused = true;
 let onBattery = false;
+let intelGPU = false;
 let settings = renderSettings({ profile, wallpaper, pixelRatio: devicePixelRatio });
 let requestedRate = prefs.frameRate;
 let loop = null, applyPower = null;
@@ -36,8 +37,7 @@ window.habitatRate = (fps) => {
 window.habitatPower = (battery) => {
   const next = Boolean(battery);
   if (next === onBattery) return;
-  onBattery = next;
-  settings = renderSettings({ profile, wallpaper, pixelRatio: devicePixelRatio, onBattery });
+  settings = renderSettings({ profile, wallpaper, pixelRatio: devicePixelRatio, onBattery, intelGPU });
   applyPower?.();
 };
 // A pinch of food, for a host with no pointer to click with. Defined before the scene
@@ -63,6 +63,13 @@ async function start() {
     alpha: false,
     powerPreference: settings.powerPreference,
   });
+  const gl = renderer.getContext();
+  const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
+  const rendererName = debugInfo
+    ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
+    : gl.getParameter(gl.RENDERER);
+  intelGPU = /intel/i.test(String(rendererName || ""));
+  settings = renderSettings({ profile, wallpaper, pixelRatio: devicePixelRatio, intelGPU });
   renderer.setPixelRatio(1);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.autoUpdate = false;
@@ -174,6 +181,16 @@ async function start() {
   const postScene = new THREE.Scene(),
     postCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
   const aoRadiusStep = settings.aoSamples > 1 ? 14.85 / (settings.aoSamples - 1) : 0;
+  const aoStrength = settings.aoSamples > 0 ? 0.022 * 12 / settings.aoSamples : 0;
+  const aoShader = settings.aoSamples > 0 ? `
+        float center=distanceAt(vUv);
+        for(int i=0;i<${settings.aoSamples};i++) {
+          float a=float(i)*2.399963;float radius=2.5+float(i)*${aoRadiusStep.toFixed(8)};
+          float sampleDepth=distanceAt(vUv+vec2(cos(a),sin(a))*radius*aoRadiusScale/size);
+          float difference=center-sampleDepth;
+          occlusion+=smoothstep(.012,.13,difference)*(1.-smoothstep(.2,.8,difference));
+        }
+      ` : "";
   const post = new THREE.ShaderMaterial({
     uniforms: {
       beauty: { value: target.texture },
@@ -189,14 +206,9 @@ async function start() {
       uniform sampler2D beauty;uniform sampler2D depth;uniform vec2 size;uniform vec2 nearFar;uniform float aoRadiusScale;varying vec2 vUv;
       float distanceAt(vec2 p){float z=texture2D(depth,p).x;return nearFar.x*nearFar.y/(nearFar.y-z*(nearFar.y-nearFar.x));}
       void main(){
-        vec3 color=texture2D(beauty,vUv).rgb;float center=distanceAt(vUv);float occlusion=0.;
-        for(int i=0;i<${settings.aoSamples};i++) {
-          float a=float(i)*2.399963;float radius=2.5+float(i)*${aoRadiusStep.toFixed(8)};
-          float sampleDepth=distanceAt(vUv+vec2(cos(a),sin(a))*radius*aoRadiusScale/size);
-          float difference=center-sampleDepth;
-          occlusion+=smoothstep(.012,.13,difference)*(1.-smoothstep(.2,.8,difference));
-        }
-        color*=1.-occlusion*${(0.022 * 12 / settings.aoSamples).toFixed(8)};
+        vec3 color=texture2D(beauty,vUv).rgb;float occlusion=0.;
+        ${aoShader}
+        color*=1.-occlusion*${aoStrength.toFixed(8)};
         float vignette=dot((vUv-.5)*vec2(1.,.85),(vUv-.5)*vec2(1.,.85));
         color*=1.-vignette*.15;
         gl_FragColor=vec4(color,1.);
@@ -215,7 +227,7 @@ async function start() {
   function resize() {
     const bounds = canvas.getBoundingClientRect();
     // DPR may change when a preview moves between monitors.
-    settings = renderSettings({ profile, wallpaper, pixelRatio: devicePixelRatio, onBattery });
+    settings = renderSettings({ profile, wallpaper, pixelRatio: devicePixelRatio, onBattery, intelGPU });
     const dimensions = framebufferSize(bounds.width, bounds.height, Math.min(settings.resolution * prefs.renderScale / 100, Math.sqrt(4200000 / (bounds.width * bounds.height))), maxDimension);
     zeroSize = !dimensions;
     visibility();
@@ -402,8 +414,8 @@ async function start() {
   // Properties may arrive while textures and geometry are still loading.
   for (const name of ['frameRate','paused','renderScale','light','follow']) window.stillwaterApply(name);
   window.habitatStats = () => ({
-    ready, foodCount: food.pellets?.length, profile, onBattery, resolution: settings.resolution,
-    framebuffer: [target.width, target.height], samples: target.samples,
+    ready, foodCount: food.pellets?.length, profile, intelGPU, onBattery, resolution: settings.resolution,
+    framebuffer: [target.width, target.height], samples: target.samples, aoSamples: settings.aoSamples,
     shadowSize: settings.shadowSize,
     shadowHz: Number.isFinite(settings.shadowHz) ? settings.shadowHz : "per-frame",
     renderedFrames, shadowFrames, simulationTime: time,

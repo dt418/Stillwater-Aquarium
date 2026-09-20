@@ -39,21 +39,24 @@ export const PROFILES = Object.freeze({
 });
 
 export function renderSettings({
-  profile = 'balanced', wallpaper = false, pixelRatio = 1, onBattery = false,
+  profile = 'balanced', wallpaper = false, pixelRatio = 1, onBattery = false, intelGPU = false,
 } = {}) {
   const budget = PROFILES[profile] || PROFILES.balanced;
   const dpr = Number.isFinite(pixelRatio) && pixelRatio > 0 ? pixelRatio : 1;
   const referenceResolution = wallpaper ? Math.min(2, Math.max(1.5, dpr)) : 1.5;
+  const intelFluid = intelGPU && budget.name === 'fluid';
   return {
     ...budget,
-    // Do not make Retina resolution a multiplier of an already supersampled target.
     resolution: budget.name === 'reference' ? referenceResolution :
       (onBattery ? budget.batteryResolution : budget.resolution),
     referenceResolution,
-    shadowHz: onBattery ? budget.batteryShadowHz : budget.shadowHz,
+    shadowSize: intelFluid ? 512 : budget.shadowSize,
+    shadowHz: onBattery ? budget.batteryShadowHz : (intelFluid ? 6 : budget.shadowHz),
     // Fluid mode trades a little edge quality for substantially lower bandwidth.
-    // Other profiles retain the upstream 4x MSAA foliage coverage.
-    samples: budget.samples,
+    // Intel integrated GPUs use no post AO sample or MSAA in fluid mode; the
+    // quality profiles keep those effects available when more GPU headroom exists.
+    samples: intelFluid ? 0 : budget.samples,
+    aoSamples: intelFluid ? 0 : budget.aoSamples,
   };
 }
 

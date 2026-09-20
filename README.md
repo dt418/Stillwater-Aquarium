@@ -49,8 +49,9 @@ Thiết lập để ưu tiên mượt:
 - Giữ Native refresh và bật Show measured FPS.
 - Render resolution mặc định 65%; giảm xuống 55% hoặc 50% nếu cần thêm FPS.
 - Dựng hình giới hạn 4,2 triệu pixel để tránh oversampling quá mức trên màn hình 4K.
-- 2× MSAA; hậu kỳ AO dùng 1 mẫu ở profile fluid; shadow map 768 và bóng cập nhật 12 lần/giây. Cây vẫn nhận bóng
-  nhưng không dựng thêm một lượt hình học cây vào shadow map.
+- Fluid profile mặc định dùng 2× MSAA, AO 1 mẫu, shadow map 768 và bóng cập nhật 12 lần/giây. Trên Intel integrated GPU,
+  fluid tự động tắt MSAA/AO và hạ shadow map xuống 512, cập nhật bóng 6 lần/giây; Balanced/Reference giữ chất lượng cao hơn.
+- Cây vẫn nhận bóng nhưng không dựng thêm một lượt hình học cây vào shadow map.
 - Hình học, chuyển động cá/cây và nhịp render vẫn độc lập với nhịp cập nhật bóng.
 - Chọn GPU mạnh cho trình phát web của Lively trong cài đặt Graphics của Windows
   nếu máy có nhiều GPU. Thiết lập pause khi game/fullscreen hoặc khi dùng pin ở Lively.
