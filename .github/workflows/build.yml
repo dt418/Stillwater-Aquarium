@@ -7,9 +7,15 @@ on:
       - build.mjs
       - package.json
       - package-lock.json
+      - controls.js
+      - index.html
+      - style.css
+      - LivelyProperties.json
       - scenes/riverscape/src/**
+      - scenes/riverscape/tests/**
       - vendor/**
       - .github/workflows/build.yml
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -24,8 +30,7 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npm run build
-      - run: npm test
+      - run: npm run validate
       - name: Commit generated offline bundle
         run: |
           if git diff --quiet -- aquarium.js scenes/riverscape/src/texture-assets.js; then

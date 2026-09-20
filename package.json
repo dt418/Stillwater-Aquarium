@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "test": "node --check controls.js && node --check aquarium.js && node scenes/riverscape/tests/settings-persistence.mjs && node scenes/riverscape/tests/render-policy.mjs && node scenes/riverscape/tests/fish-behavior.mjs && node scenes/riverscape/tests/plant-budget.mjs"
+    "test": "node --check controls.js && node --check aquarium.js && node scenes/riverscape/tests/settings-persistence.mjs && node scenes/riverscape/tests/render-policy.mjs && node scenes/riverscape/tests/fish-behavior.mjs && node scenes/riverscape/tests/plant-budget.mjs",
+    "validate": "npm run build && npm test"
   },
   "devDependencies": {
     "esbuild": "0.28.2"
