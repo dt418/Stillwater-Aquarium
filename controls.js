@@ -1,7 +1,7 @@
 // Settings are available before the renderer starts, including early Lively callbacks.
 (()=>{
  const statsPositions=['top-left','top-right','bottom-left','bottom-right'];
- const defaults={frameRate:360,renderScale:75,light:100,follow:true,showStats:false,statsPosition:'bottom-right',paused:false};
+ const defaults={frameRate:360,renderScale:65,light:100,follow:true,showStats:false,statsPosition:'bottom-right',paused:false};
  const prefs={...defaults};const rates=[60,120,144,165,240,360];
  function frameRateValue(value,fromLively=false){
   if(typeof value==='string'){

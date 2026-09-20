@@ -173,6 +173,7 @@ async function start() {
   target.depthTexture = new THREE.DepthTexture(1, 1, THREE.UnsignedIntType);
   const postScene = new THREE.Scene(),
     postCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  const aoRadiusStep = settings.aoSamples > 1 ? 14.85 / (settings.aoSamples - 1) : 0;
   const post = new THREE.ShaderMaterial({
     uniforms: {
       beauty: { value: target.texture },
@@ -190,7 +191,7 @@ async function start() {
       void main(){
         vec3 color=texture2D(beauty,vUv).rgb;float center=distanceAt(vUv);float occlusion=0.;
         for(int i=0;i<${settings.aoSamples};i++) {
-          float a=float(i)*2.399963;float radius=2.5+float(i)*${(14.85 / (settings.aoSamples - 1)).toFixed(8)};
+          float a=float(i)*2.399963;float radius=2.5+float(i)*${aoRadiusStep.toFixed(8)};
           float sampleDepth=distanceAt(vUv+vec2(cos(a),sin(a))*radius*aoRadiusScale/size);
           float difference=center-sampleDepth;
           occlusion+=smoothstep(.012,.13,difference)*(1.-smoothstep(.2,.8,difference));

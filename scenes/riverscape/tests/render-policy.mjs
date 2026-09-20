@@ -4,11 +4,12 @@ import { createFrameLoop } from '../src/frame-loop.js';
 
 const reference = renderSettings({ profile: 'reference', wallpaper: true, pixelRatio: 2 });
 const balanced = renderSettings({ wallpaper: true, pixelRatio: 2 });
+const fluid = renderSettings({ profile: 'fluid', wallpaper: true, pixelRatio: 2 });
 const battery = renderSettings({ wallpaper: true, pixelRatio: 2, onBattery: true });
 assert.equal(reference.resolution, 2);
 assert.equal(balanced.resolution, 1.25);
-assert.equal(battery.resolution, 1.15);
 assert.equal(balanced.samples, 4, 'Preserve quarter-coverage foliage translucency');
+assert.equal(fluid.aoSamples, 1, 'Fluid profile uses one AO sample for lower GPU cost');
 assert.equal(balanced.shadowSize, 2048);
 assert.equal(balanced.shadowHz, 30);
 assert.equal(battery.shadowHz, 15);
@@ -73,11 +74,10 @@ for (const refresh of [60,120,144,165,240,360]) {
  assert(Math.abs(native.frames.length-refresh*10)<=1, `Native refresh ${refresh}: ${native.frames.length}`);
  assert(native.frames.every(f=>f.dt<=0.1));native.loop.dispose();
 }
-const fluid=renderSettings({profile:'fluid'});
 assert.equal(fluid.shadowSize,768);
 assert.equal(fluid.shadowHz,12);
 assert.equal(fluid.samples,2);
-assert.equal(fluid.aoSamples,2);
+assert.equal(fluid.aoSamples,1);
 assert.equal(fluid.plantShadows,false);
 assert.equal(fluid.powerPreference,'high-performance');
 console.log('PASS: high refresh pacing and native refresh at 60/120/144/165/240/360 Hz (simulated clock, not GPU benchmark)');

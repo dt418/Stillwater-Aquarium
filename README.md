@@ -47,9 +47,9 @@ Nó đo nhịp render của ứng dụng, không đo trực tiếp khung hình t
 
 Thiết lập để ưu tiên mượt:
 - Giữ Native refresh và bật Show measured FPS.
-- Render resolution mặc định 75%; giảm xuống 65% hoặc 55% nếu cần.
+- Render resolution mặc định 65%; giảm xuống 55% hoặc 50% nếu cần thêm FPS.
 - Dựng hình giới hạn 4,2 triệu pixel để tránh oversampling quá mức trên màn hình 4K.
-- 2× MSAA; shadow map 768 và bóng cập nhật 12 lần/giây. Cây vẫn nhận bóng
+- 2× MSAA; hậu kỳ AO dùng 1 mẫu ở profile fluid; shadow map 768 và bóng cập nhật 12 lần/giây. Cây vẫn nhận bóng
   nhưng không dựng thêm một lượt hình học cây vào shadow map.
 - Hình học, chuyển động cá/cây và nhịp render vẫn độc lập với nhịp cập nhật bóng.
 - Chọn GPU mạnh cho trình phát web của Lively trong cài đặt Graphics của Windows

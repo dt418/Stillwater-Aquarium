@@ -4,7 +4,7 @@ export const PROFILES = Object.freeze({
   fluid: Object.freeze({
     name: 'fluid', resolution: 1, batteryResolution: 0.7,
     shadowSize: 768, shadowHz: 12, batteryShadowHz: 6,
-    aoSamples: 2, backgroundDensity: 0.58, backgroundRows: 16,
+    aoSamples: 1, backgroundDensity: 0.58, backgroundRows: 16,
     backgroundCols: 2, powerPreference: 'high-performance',
     samples: 2, plantShadows: false,
   }),
