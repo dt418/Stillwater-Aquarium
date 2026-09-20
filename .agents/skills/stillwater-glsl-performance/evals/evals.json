@@ -1,0 +1,23 @@
+{
+  "skill_name": "stillwater-glsl-performance",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "The foliage shader is expensive on Intel. Profile it and reduce fragment cost while keeping thin-leaf transmission, current-driven motion, water lighting, and the authored silhouette.",
+      "expected_output": "A shader census identifies invocation cost and visual ownership, then makes a bounded source change with browser compilation, screenshot comparison, and measured validation.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "The water shader has several sine/cosine terms and sometimes compiles to a black screen after edits. Review the GLSL data flow and improve it without breaking waterTime synchronization or GLSL ES compatibility.",
+      "expected_output": "The response distinguishes uniforms, attributes, varyings, coordinate spaces, and typed literals; it validates actual browser compilation and keeps the shared clock coherent.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Can we move more of the aquarium's water-light calculation into the vertex shader to gain FPS? Evaluate the request, identify which terms require fragment derivatives or per-pixel lighting, and only change safe terms.",
+      "expected_output": "A reasoned stage-placement decision preserves per-pixel features that need fragments, uses interpolation only where valid, and reports the visual and timing tradeoff.",
+      "files": []
+    }
+  ]
+}

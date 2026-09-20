@@ -1,0 +1,23 @@
+{
+  "skill_name": "stillwater-performance",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Fluid on my Intel integrated GPU is using too much GPU and the aquarium stutters. Measure the current render workload, identify the dominant bottleneck, and make the smallest quality-preserving optimization. Keep the scene offline and validate it.",
+      "expected_output": "A measured baseline, a narrow source change in the owning render path, generated bundle, validation, and browser-smoke evidence with no claim that service time equals monitor FPS.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Draw calls are rising after repeatedly feeding and reloading the aquarium. Investigate whether this is a resource or batching problem, fix the owner if needed, and prove renderer memory/call counts do not grow across the relevant lifecycle.",
+      "expected_output": "Evidence distinguishes draw-call growth from resource leakage, uses existing batching/disposal owners, and verifies the lifecycle without adding network dependencies.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Can you make the wallpaper cheaper on laptop battery without making the river look flat or changing fish speed? Review the quality ladder and apply one reversible profile-level tradeoff.",
+      "expected_output": "One measured profile-level change preserves authored lighting/shadow anchors and timestamp-based simulation, with settings mapping, validation, and visual/runtime checks.",
+      "files": []
+    }
+  ]
+}
