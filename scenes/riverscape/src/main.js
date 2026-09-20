@@ -331,12 +331,24 @@ async function start() {
     }
     if (event.key.toLowerCase() === "f") fullscreen();
   });
-  // Mesh transforms are static. Fish/food use instance matrices, foliage and particles
-  // move in vertex shaders. Avoid recomposing every unchanged object matrix per frame.
+  // Mesh transforms are static. Fish, food and particles update instance buffers and
+  // shader attributes instead of object matrices, so skip the scene-graph world traversal.
   scene.traverse((object) => { object.updateMatrix(); object.matrixAutoUpdate = false; });
   scene.updateMatrixWorld(true);
+  scene.matrixWorldAutoUpdate = false;
+  postScene.updateMatrixWorld(true);
+  postScene.matrixWorldAutoUpdate = false;
+  if (renderer.compileAsync) {
+    try {
+      await renderer.compileAsync(scene, camera);
+      await renderer.compileAsync(postScene, postCamera);
+    } catch (error) {
+      console.warn("Shader warmup skipped:", error.message);
+    }
+  }
   let time = 0, lastShadowTime = -Infinity, renderedFrames = 0, shadowFrames = 0;
   let ready = false;
+  const collectFrameStats = prefs.showStats || query.get("diagnostics") === "1";
   function renderFrame(dt, now) {
     // Short substeps keep feeding/swimming stable at 20/30 fps without slowing the
     // simulation down. Long suspended periods never reach this function as elapsed time.
@@ -360,13 +372,14 @@ async function start() {
       forceShadows = false;
       shadowFrames++;
     }
-    renderer.info.reset();
+    if (collectFrameStats) renderer.info.reset();
     renderer.setRenderTarget(target);
     renderer.render(scene, camera);
     renderer.setRenderTarget(null);
     renderer.render(postScene, postCamera);
     renderedFrames++;
-    window.stillwaterMeter?.(now, {framebuffer:[target.width,target.height], calls:renderer.info.render.calls});
+    if (collectFrameStats)
+      window.stillwaterMeter?.(now, { framebuffer: [target.width, target.height], calls: renderer.info.render.calls });
     if (!ready) {
       ready = true;
       loading.style.opacity = 0;
