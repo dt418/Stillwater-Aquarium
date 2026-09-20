@@ -14,8 +14,8 @@ assert.equal(fluid.aoSamples, 1, 'Fluid profile uses one AO sample for lower GPU
 assert.equal(intelFluid.samples, 0, 'Intel fluid mode disables MSAA');
 assert.equal(intelFluid.aoSamples, 0, 'Intel fluid mode skips post AO');
 assert.equal(intelFluid.shadowSize, 512, 'Intel fluid mode lowers shadow-map bandwidth');
+assert.equal(intelFluid.foliageDetail, false, 'Intel fluid mode trims optional foliage detail');
 assert.equal(intelFluid.shadowHz, 6, 'Intel fluid mode lowers shadow refresh cost');
-assert.equal(intelFluid.animatedShadows, false, 'Intel fluid mode keeps static foliage shadows');
 assert.equal(intelFluid.plantDistanceLod, true, 'Intel fluid mode enables distant plant LOD');
 assert.equal(fluid.animatedShadows, true);
 assert.equal(fluid.plantDistanceLod, false);

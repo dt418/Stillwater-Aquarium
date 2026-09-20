@@ -53,7 +53,7 @@ const strandPosition = /* glsl */ `
 // Submerged leaves show almost no specular reflection: leaf tissue and water have
 // nearly the same refractive index, so what reaches the eye is diffuse reflection
 // and light transmitted through the thin blade.
-export function foliageMaterial() {
+export function foliageMaterial({ detail = true } = {}) {
   const material = new THREE.MeshPhysicalMaterial({
     color: 0xffffff,
     roughness: 0.58,
@@ -63,6 +63,38 @@ export function foliageMaterial() {
     vertexColors: true,
     alphaToCoverage: true,
   });
+  const colorFragment = detail
+    ? /* glsl */ `#include <color_fragment>
+      // The midrib highlight fades once a leaf is only a few pixels wide, so needle
+      // leaves do not clip to white specks.
+      float midrib = (1.0 - smoothstep(.008, .035, abs(leafUv.x - .5))) * (1.0 - smoothstep(.02, .06, fwidth(leafUv.x)));
+      float veins = pow(.5 + .5 * cos((leafUv.y - abs(leafUv.x - .5) * .32) * 155.0), 22.0);
+      float edge = pow(abs(leafUv.x - .5) * 2.0, 5.0);
+      float mottling = .965 + .035 * sin(leafUv.y * 64.0 + sin(leafUv.x * 25.0));
+      diffuseColor.rgb *= mottling * (1.0 - .09 * edge + .12 * veins);
+      diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * 1.22 + vec3(.008,.012,0.), midrib * .6);
+      // Leaf undersides are paler and warmer than the upper surface.
+      if (!gl_FrontFacing) diffuseColor.rgb *= vec3(.82, .76, .66);
+      // Thin tissue lets part of the scene behind show through. Coverage is held to exact
+      // quarters of the four multisamples so the driver never dithers it into a pattern:
+      // ribbon leaves pass a quarter of the light, their thinner edges half.
+      diffuseColor.a = vThin < .7 ? 1.0 : (edge > .45 ? .5 : .75);`
+    : /* glsl */ `#include <color_fragment>
+      if (!gl_FrontFacing) diffuseColor.rgb *= vec3(.82, .76, .66);
+      float edge = abs(leafUv.x - .5) * 2.0;
+      diffuseColor.a = vThin < .7 ? 1.0 : (edge > .45 ? .5 : .75);`;
+  const normalFragment = detail
+    ? /* glsl */ `#include <normal_fragment_maps>
+      float rib = exp(-pow((leafUv.x-.5)*60.,2.))*.0015;
+      float veinHeight = pow(.5+.5*cos((leafUv.y-abs(leafUv.x-.5)*.32)*155.),16.)*.00025;
+      float detailFade = 1.-smoothstep(.003,.012,max(fwidth(leafUv.x),fwidth(leafUv.y)));
+      float micro = sin(leafUv.x*230.)*sin(leafUv.y*310.)*.00003*detailFade;
+      float surfaceHeight = rib + veinHeight + micro;
+      vec3 dp1=dFdx(-vViewPosition),dp2=dFdy(-vViewPosition);
+      vec3 r1=cross(dp2,normal),r2=cross(normal,dp1);
+      float det=dot(dp1,r1);
+      normal=normalize(abs(det)*normal-sign(det)*(dFdx(surfaceHeight)*r1+dFdy(surfaceHeight)*r2));`
+    : /* glsl */ `#include <normal_fragment_maps>`;
   material.onBeforeCompile = (shader) => {
     shader.vertexShader = strandVertex + shader.vertexShader;
     shader.vertexShader = shader.vertexShader
@@ -79,36 +111,11 @@ export function foliageMaterial() {
     ` + shader.fragmentShader;
     shader.fragmentShader = shader.fragmentShader.replace(
       "#include <color_fragment>",
-      /* glsl */ `#include <color_fragment>
-      // The midrib highlight fades once a leaf is only a few pixels wide, so needle
-      // leaves do not clip to white specks.
-      float midrib = (1.0 - smoothstep(.008, .035, abs(leafUv.x - .5))) * (1.0 - smoothstep(.02, .06, fwidth(leafUv.x)));
-      float veins = pow(.5 + .5 * cos((leafUv.y - abs(leafUv.x - .5) * .32) * 155.0), 22.0);
-      float edge = pow(abs(leafUv.x - .5) * 2.0, 5.0);
-      float mottling = .965 + .035 * sin(leafUv.y * 64.0 + sin(leafUv.x * 25.0));
-      diffuseColor.rgb *= mottling * (1.0 - .09 * edge + .12 * veins);
-      diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * 1.22 + vec3(.008,.012,0.), midrib * .6);
-      // Leaf undersides are paler and warmer than the upper surface.
-      if (!gl_FrontFacing) diffuseColor.rgb *= vec3(.82, .76, .66);
-      // Thin tissue lets part of the scene behind show through. Coverage is held to exact
-      // quarters of the four multisamples so the driver never dithers it into a pattern:
-      // ribbon leaves pass a quarter of the light, their thinner edges half.
-      diffuseColor.a = vThin < .7 ? 1.0 : (edge > .45 ? .5 : .75);
-    `,
+      colorFragment,
     );
     shader.fragmentShader = shader.fragmentShader.replace(
       "#include <normal_fragment_maps>",
-      /* glsl */ `#include <normal_fragment_maps>
-      float rib = exp(-pow((leafUv.x-.5)*60.,2.))*.0015;
-      float veinHeight = pow(.5+.5*cos((leafUv.y-abs(leafUv.x-.5)*.32)*155.),16.)*.00025;
-      float detailFade = 1.-smoothstep(.003,.012,max(fwidth(leafUv.x),fwidth(leafUv.y)));
-      float micro = sin(leafUv.x*230.)*sin(leafUv.y*310.)*.00003*detailFade;
-      float surfaceHeight = rib + veinHeight + micro;
-      vec3 dp1=dFdx(-vViewPosition),dp2=dFdy(-vViewPosition);
-      vec3 r1=cross(dp2,normal),r2=cross(normal,dp1);
-      float det=dot(dp1,r1);
-      normal=normalize(abs(det)*normal-sign(det)*(dFdx(surfaceHeight)*r1+dFdy(surfaceHeight)*r2));
-    `,
+      normalFragment,
     );
     waterLitShader(shader, {
       // Light reaching the far side of a thin leaf is scattered through the tissue, which
@@ -119,7 +126,7 @@ export function foliageMaterial() {
       `,
     });
   };
-  material.customProgramCacheKey = () => "aquatic-leaves-v2";
+  material.customProgramCacheKey = () => `aquatic-leaves-v2-${detail ? "detail" : "lite"}`;
   return material;
 }
 

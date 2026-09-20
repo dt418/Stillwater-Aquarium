@@ -164,6 +164,7 @@ async function start() {
   const { obstacles, landmarks } = await createEnvironment(scene);
   const plants = createPlants(scene, {
     ...settings, distanceLod: settings.plantDistanceLod,
+    foliageDetail: settings.foliageDetail,
     animatedShadows: settings.animatedShadows,
     castShadows: settings.plantShadows,
   });
@@ -453,6 +454,7 @@ async function start() {
   window.habitatStats = () => ({
     ready, foodCount: food.pellets?.length, profile, fishCount, intelGPU, onBattery, resolution: settings.resolution,
     adaptiveScale: adaptiveScale.scale, adaptiveTimer: Boolean(gpuTimerExt),
+    foliageDetail: settings.foliageDetail,
     animatedShadows: settings.animatedShadows,
     framebuffer: [target.width, target.height], samples: target.samples, aoSamples: settings.aoSamples,
     shadowSize: settings.shadowSize,
