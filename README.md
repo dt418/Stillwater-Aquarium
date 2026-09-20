@@ -48,7 +48,7 @@ Nó đo nhịp render của ứng dụng, không đo trực tiếp khung hình t
 
 Thiết lập để ưu tiên mượt:
 - Giữ Native refresh và bật Show measured FPS.
-- Render resolution mặc định 65%; giảm xuống 55% hoặc 50% nếu cần thêm FPS.
+- Render resolution mặc định 75%; giảm xuống 65% hoặc 55% nếu cần thêm FPS.
 - Dựng hình giới hạn 4,2 triệu pixel để tránh oversampling quá mức trên màn hình 4K.
 - Fluid profile mặc định dùng 2× MSAA, AO 1 mẫu, shadow map 768 và bóng cập nhật 12 lần/giây. Trên Intel integrated GPU,
   fluid tự động tắt MSAA/AO, dùng shadow map 512; bóng cây giữ tĩnh còn bóng cá cập nhật 6 lần/giây, giảm nhẹ chi tiết cây ở xa và tự hạ render scale khi cadence thấp kéo dài; Balanced/Reference giữ chất lượng cao hơn.

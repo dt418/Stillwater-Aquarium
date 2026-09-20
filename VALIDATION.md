@@ -33,9 +33,10 @@ A preview is included. The preview is a render of this package, not an upstream 
 ## Practical performance settings
 
 Choose the monitor's actual high refresh rate in Windows. Use Native refresh in
-this wallpaper and enable Show measured FPS. If below target, reduce Render
-resolution from 75% to 65% or 55%. Browser/host scheduling, GPU and monitor limits
-still apply. No FPS is claimed merely because a menu value was selected.
+this wallpaper and enable Show measured FPS. The default render resolution is 75%;
+reduce it to 65% or 55% if the target device needs more headroom. Browser/host
+scheduling, GPU and monitor limits still apply. No FPS is claimed merely because a
+menu value was selected.
 
 ## Optimization measurement
 

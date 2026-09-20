@@ -4,7 +4,7 @@ import vm from "node:vm";
 
 const defaults = {
   frameRate: 360,
-  renderScale: 65,
+  renderScale: 75,
   light: 100,
   fishCount: 24,
   profile: "fluid",

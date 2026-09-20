@@ -27,7 +27,7 @@
     "min": 50,
     "max": 125,
     "tick": 5,
-    "value": 65,
+    "value": 75,
     "text": "Render resolution (%)"
   },
   "light": {
