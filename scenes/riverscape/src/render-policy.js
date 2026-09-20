@@ -100,10 +100,8 @@ export function renderSettings({
     shadowSize: intelFluid ? 512 : budget.shadowSize,
     shadowHz: onBattery ? budget.batteryShadowHz : (intelFluid ? 6 : budget.shadowHz),
     // Fluid mode trades a little edge quality for substantially lower bandwidth.
-    // Intel integrated GPUs use a reduced foliage detail path plus no post AO sample
-    // or MSAA in fluid mode; the quality profiles keep those effects available when
-    // more GPU headroom exists.
-    foliageDetail: !intelFluid,
+    // Intel integrated GPUs use no post AO sample or MSAA in fluid mode; the
+    // quality profiles keep those effects available when more GPU headroom exists.
     samples: intelFluid ? 0 : budget.samples,
     aoSamples: intelFluid ? 0 : budget.aoSamples,
   };

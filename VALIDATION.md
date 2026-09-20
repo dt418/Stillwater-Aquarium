@@ -54,8 +54,3 @@ scale after 30 GPU samples at or above 38 ms (about 26 service FPS) and restores
 after 300 samples at or below 24 ms (about 42 service FPS); the asymmetric window
 prevents resize oscillation. These thresholds are policy guardrails, not physical
 FPS claims; use the opt-in diagnostics benchmark for target-device measurements.
-
-Fluid Intel keeps the key shadow, Physical materials, and water-light response. Only
-the optional foliage fragment-detail branch is reduced; strand motion, alpha coverage,
-water lighting, and foliage silhouette remain active. This named quality rung requires
-before/after screenshot comparison rather than treating it as an equivalent material.

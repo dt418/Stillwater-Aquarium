@@ -226,7 +226,7 @@ function mossLayer(material, film, turf) {
         if (vMoss > 0.02) {
           float mossFine = mossNoise(vWaterPosition * 9.0) * 0.6 + mossNoise(vWaterPosition * 27.0) * 0.4;
           gMoss = smoothstep(0.07, 0.5, vMoss + (mossFine - 0.5) * 0.45);
-          gMossColor = mix(mossFilm, mossTurf, smoothstep(0.15, 0.85, vMoss)) * (0.6 + 0.8 * mossFine);
+          gMossColor = mix(mossFilm, mossTurf, smoothstep(0.15, 0.85, vMoss)) * (0.72 + 0.9 * mossFine);
           // Growth lies in the same shade as the surface it grows on: the pit of a stone,
           // a split in the bark, the sand under the canopy.
           #ifdef USE_COLOR
@@ -245,7 +245,7 @@ function mossLayer(material, film, turf) {
         "#include <normal_fragment_maps>",
         /* glsl */ `
         #include <normal_fragment_maps>
-        normal = normalize(normal + gMoss * 0.5 * mossFuzz);
+        normal = normalize(normal + gMoss * 0.65 * mossFuzz);
       `,
       )
       .replace(
@@ -253,7 +253,7 @@ function mossLayer(material, film, turf) {
         /* glsl */ `
         #include <lights_fragment_end>
         float grazing = pow(1.0 - saturate(dot(normal, geometryViewDir)), 3.0);
-        reflectedLight.indirectDiffuse += gMoss * grazing * gMossColor * 0.6;
+        reflectedLight.indirectDiffuse += gMoss * grazing * gMossColor * 0.72;
       `,
       );
     waterLitShader(shader);
@@ -596,13 +596,13 @@ function plantFronds(scene, groups) {
 export async function createEnvironment(scene) {
   const loader = new THREE.TextureLoader();
   const [rockMaterial, woodMaterial, sandMaterial] = await Promise.all([
-    surface(loader, "rock_boulder_dry", [1.8, 1.4], 0x62665d, "#2e4315"),
+    surface(loader, "rock_boulder_dry", [1.8, 1.4], 0x70766e, "#2e4315"),
     surface(loader, "rough_wood", [2.1, 1.4], 0xc3ad8e, "#334a16"),
     surface(loader, "sand_01", [10, 6], 0xf4e5c8, "#5a5a26", "#23401a"),
   ]);
-  rockMaterial.normalScale.set(0.85, 0.85);
+  rockMaterial.normalScale.set(0.98, 0.98);
   woodMaterial.roughness = 0.86;
-  woodMaterial.normalScale.set(0.8, 0.8);
+  woodMaterial.normalScale.set(0.88, 0.88);
   sandMaterial.normalScale.set(0.32, 0.32);
 
   const rocks = ROCKS;

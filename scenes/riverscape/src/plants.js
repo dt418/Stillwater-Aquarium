@@ -143,7 +143,7 @@ const grassHeight = (x) => 5.4 + 4.0 * smoothstep(2.0, 7.5, Math.abs(x));
 
 export function createPlants(scene, {
   backgroundDensity = 0.7, backgroundRows = 20, backgroundCols = 2,
-  animatedShadows = true, castShadows = true, distanceLod = false, foliageDetail = true,
+  animatedShadows = true, castShadows = true, distanceLod = false,
 } = {}) {
   const batch = new GeometryBatch();
   const density = Number.isFinite(backgroundDensity) ? Math.max(0, Math.min(1, backgroundDensity)) : 0.7;
@@ -257,7 +257,7 @@ export function createPlants(scene, {
     [-8.55, -3.3, 6.1, 5],
   ])
     ribbonRosette(batch, x, z, height, leaves);
-  const mesh = new THREE.Mesh(batch.geometry(), foliageMaterial({ detail: foliageDetail }));
+  const mesh = new THREE.Mesh(batch.geometry(), foliageMaterial());
   mesh.name = 'Aquatic planting';
   mesh.customDepthMaterial = foliageDepth({ animated: animatedShadows });
   mesh.castShadow = castShadows;
