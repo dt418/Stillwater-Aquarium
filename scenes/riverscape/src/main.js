@@ -21,6 +21,7 @@ let paused =
   matchMedia("(prefers-reduced-motion: reduce)").matches;
 const query = new URLSearchParams(location.search);
 const wallpaper = document.documentElement.dataset.motion === "host";
+const prefs = window.stillwaterPreferences || {};
 const profile = prefs.profile || "fluid";
 const fishCount = prefs.fishCount || 24;
 if (query.get("still") === "1") paused = true;
@@ -370,13 +371,12 @@ async function start() {
   }
   let time = 0, lastShadowTime = -Infinity, renderedFrames = 0, shadowFrames = 0;
   const gpuTimerExt = gl.getExtension("EXT_disjoint_timer_query_webgl2");
-  let gpuTimerQuery = null;
+  let gpuTimerQuery = null, gpuTimerActive = false;
   function pollGpuTime() {
     if (!gpuTimerExt || !gpuTimerQuery ||
-        !gl.getQuery(gpuTimerExt.QUERY_RESULT_AVAILABLE, gpuTimerQuery)) return null;
+        !gl.getQueryParameter(gpuTimerQuery, gl.QUERY_RESULT_AVAILABLE)) return null;
     const disjoint = gl.getParameter(gpuTimerExt.GPU_DISJOINT_EXT);
-    const nanoseconds = gl.getQuery(gpuTimerExt.QUERY_RESULT, gpuTimerQuery);
-    gl.deleteQuery(gpuTimerQuery);
+    const nanoseconds = gl.getQueryParameter(gpuTimerQuery, gl.QUERY_RESULT);
     gpuTimerQuery = null;
     return disjoint ? null : nanoseconds / 1e6;
   }
@@ -414,6 +414,7 @@ async function start() {
       const queryObject = gl.createQuery();
       if (queryObject) {
         gpuTimerQuery = queryObject;
+        gpuTimerActive = true;
         gl.beginQuery(gpuTimerExt.TIME_ELAPSED_EXT, gpuTimerQuery);
       }
     }
@@ -421,7 +422,10 @@ async function start() {
     renderer.render(scene, camera);
     renderer.setRenderTarget(null);
     renderer.render(postScene, postCamera);
-    if (gpuTimerQuery) gl.endQuery(gpuTimerExt.TIME_ELAPSED_EXT);
+    if (gpuTimerActive) {
+      gl.endQuery(gpuTimerExt.TIME_ELAPSED_EXT);
+      gpuTimerActive = false;
+    }
     renderedFrames++;
     if (collectFrameStats)
       window.stillwaterMeter?.(now, { framebuffer: [target.width, target.height], calls: renderer.info.render.calls });
