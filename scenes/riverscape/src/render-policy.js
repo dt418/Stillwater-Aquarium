@@ -38,6 +38,51 @@ export const PROFILES = Object.freeze({
   }),
 });
 
+export function createAdaptiveScaleController({
+  minScale = 0.75,
+  step = 0.05,
+  slowMs = 38,
+  fastMs = 24,
+  slowFrames = 30,
+  fastFrames = 300,
+} = {}) {
+  let scale = 1;
+  let slow = 0;
+  let fast = 0;
+  return {
+    get scale() { return scale; },
+    reset() {
+      scale = 1;
+      slow = 0;
+      fast = 0;
+    },
+    update(frameMs, enabled = true) {
+      if (!enabled || !Number.isFinite(frameMs)) return false;
+      if (frameMs >= slowMs) {
+        slow++;
+        fast = 0;
+        if (slow >= slowFrames && scale > minScale) {
+          scale = Math.max(minScale, scale - step);
+          slow = 0;
+          return true;
+        }
+      } else if (frameMs <= fastMs) {
+        fast++;
+        slow = 0;
+        if (fast >= fastFrames && scale < 1) {
+          scale = Math.min(1, scale + step);
+          fast = 0;
+          return true;
+        }
+      } else {
+        slow = 0;
+        fast = 0;
+      }
+      return false;
+    },
+  };
+}
+
 export function renderSettings({
   profile = 'balanced', wallpaper = false, pixelRatio = 1, onBattery = false, intelGPU = false,
 } = {}) {
@@ -50,6 +95,8 @@ export function renderSettings({
     resolution: budget.name === 'reference' ? referenceResolution :
       (onBattery ? budget.batteryResolution : budget.resolution),
     referenceResolution,
+    animatedShadows: !intelFluid && budget.name !== 'reference',
+    plantDistanceLod: intelFluid,
     shadowSize: intelFluid ? 512 : budget.shadowSize,
     shadowHz: onBattery ? budget.batteryShadowHz : (intelFluid ? 6 : budget.shadowHz),
     // Fluid mode trades a little edge quality for substantially lower bandwidth.

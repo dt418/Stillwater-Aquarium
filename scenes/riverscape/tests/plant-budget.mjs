@@ -12,8 +12,12 @@ if (process.argv[2] === '--sample') {
   const { createPlants } = await import('../src/plants.js');
   const { random } = await import('../src/math.js');
   const reference = process.argv[3] === 'reference';
+  const distanceLod = process.argv[3] === 'lod';
   const plants = createPlants(new THREE.Scene(), reference ? {
     backgroundDensity:1,backgroundRows:30,backgroundCols:6,
+  } : distanceLod || process.argv[3] === 'full' ? {
+    backgroundDensity:1,backgroundRows:20,backgroundCols:4,
+    ...(distanceLod ? { distanceLod:true } : {}),
   } : {});
   const hash = createHash('sha256');
   const {geometry} = plants.mesh;
@@ -30,12 +34,14 @@ if (process.argv[2] === '--sample') {
     assert.equal(child.status,0,child.stderr);
     return JSON.parse(child.stdout.trim());
   };
-  const before=sample('reference'),after=sample('balanced');
+  const before=sample('reference'),after=sample('balanced'),full=sample('full'),lod=sample('lod');
   assert.equal(after.stats.backgroundCandidates,before.stats.backgroundCandidates);
   assert(Math.abs(after.stats.backgroundKept / after.stats.backgroundCandidates - 0.7)<0.001);
   assert(after.stats.backgroundTriangles < before.stats.backgroundTriangles * 0.24);
+  assert(lod.stats.backgroundTriangles < full.stats.backgroundTriangles * 0.9,
+    'Distance LOD must reduce far-background ribbon detail');
   assert.equal(before.foregroundHash,after.foregroundHash,'Foreground geometry must be unchanged');
   assert.equal(before.nextRandom,after.nextRandom,'Subsequent procedural random state must be unchanged');
   assert.equal(before.stats.vertices-before.stats.backgroundVertices,after.stats.vertices-after.stats.backgroundVertices);
-  console.log(`PASS: rear ribbons ${before.stats.backgroundKept} -> ${after.stats.backgroundKept}; rear triangles ${before.stats.backgroundTriangles} -> ${after.stats.backgroundTriangles}; foreground attributes and downstream RNG byte-for-byte unchanged`);
+  console.log(`PASS: rear ribbons ${before.stats.backgroundKept} -> ${after.stats.backgroundKept}; rear triangles ${after.stats.backgroundTriangles}; distance LOD ${full.stats.backgroundTriangles} -> ${lod.stats.backgroundTriangles}; foreground attributes and downstream RNG byte-for-byte unchanged`);
 }

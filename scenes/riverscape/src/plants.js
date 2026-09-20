@@ -19,6 +19,7 @@ const FLOW_ANGLE = Math.atan2(FLOW_DIRECTION.z, FLOW_DIRECTION.x);
 // and the oldest tips have begun to brown.
 function ribbonRosette(batch, x, z, height, count, background = null) {
   const root = vec(x, groundHeight(x, z) - 0.025, z);
+  const detail = background?.detail(root.z);
   for (let i = 0; i < count; i++) {
     const age = random();
     const theta =
@@ -45,8 +46,8 @@ function ribbonRosette(batch, x, z, height, count, background = null) {
       0.2 + 0.17 * age,
     );
     blade(batch, points, range(0.044, 0.115), color, root, range(0.85, 1.15), {
-      rows: background ? background.rows : 30,
-      cols: background ? background.cols : 6,
+      rows: detail?.rows ?? background?.rows ?? 30,
+      cols: detail?.cols ?? background?.cols ?? 6,
       emit: background ? background.keep() : true,
       twist: theta + Math.PI / 2,
       ribbon: true,
@@ -142,7 +143,7 @@ const grassHeight = (x) => 5.4 + 4.0 * smoothstep(2.0, 7.5, Math.abs(x));
 
 export function createPlants(scene, {
   backgroundDensity = 0.7, backgroundRows = 20, backgroundCols = 2,
-  animatedShadows = true, castShadows = true,
+  animatedShadows = true, castShadows = true, distanceLod = false,
 } = {}) {
   const batch = new GeometryBatch();
   const density = Number.isFinite(backgroundDensity) ? Math.max(0, Math.min(1, backgroundDensity)) : 0.7;
@@ -157,6 +158,14 @@ export function createPlants(scene, {
       const keep = Math.floor((i + 1) * density + 1e-9) > Math.floor(i * density + 1e-9);
       if (keep) stats.backgroundKept++;
       return keep;
+    },
+    detail(z) {
+      if (!distanceLod) return null;
+      const far = smoothstep(-1.3, -5.7, z);
+      return {
+        rows: Math.max(4, Math.round(this.rows * (1 - 0.25 * far))),
+        cols: Math.max(2, Math.round(this.cols * (1 - 0.33 * far))),
+      };
     },
   };
   for (const bed of BEDS) {

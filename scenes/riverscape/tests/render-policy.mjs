@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { renderSettings, framebufferSize } from '../src/render-policy.js';
+import { renderSettings, framebufferSize, createAdaptiveScaleController } from '../src/render-policy.js';
 import { createFrameLoop } from '../src/frame-loop.js';
 
 const reference = renderSettings({ profile: 'reference', wallpaper: true, pixelRatio: 2 });
@@ -15,6 +15,18 @@ assert.equal(intelFluid.samples, 0, 'Intel fluid mode disables MSAA');
 assert.equal(intelFluid.aoSamples, 0, 'Intel fluid mode skips post AO');
 assert.equal(intelFluid.shadowSize, 512, 'Intel fluid mode lowers shadow-map bandwidth');
 assert.equal(intelFluid.shadowHz, 6, 'Intel fluid mode lowers shadow refresh cost');
+assert.equal(intelFluid.animatedShadows, false, 'Intel fluid mode keeps static foliage shadows');
+assert.equal(intelFluid.plantDistanceLod, true, 'Intel fluid mode enables distant plant LOD');
+assert.equal(fluid.animatedShadows, true);
+assert.equal(fluid.plantDistanceLod, false);
+const adaptive = createAdaptiveScaleController({ slowFrames: 3, fastFrames: 2 });
+assert.equal(adaptive.update(40), false);
+assert.equal(adaptive.update(40), false);
+assert.equal(adaptive.update(40), true);
+assert.equal(adaptive.scale, 0.95);
+assert.equal(adaptive.update(20), false);
+assert.equal(adaptive.update(20), true);
+assert.equal(adaptive.scale, 1);
 assert.equal(balanced.shadowSize, 2048);
 assert.equal(balanced.shadowHz, 30);
 assert.equal(battery.shadowHz, 15);

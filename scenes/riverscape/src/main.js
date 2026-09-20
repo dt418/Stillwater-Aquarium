@@ -6,7 +6,7 @@ import { createFood } from "./food.js";
 import { randomGenerator } from "./math.js";
 import { waterTime } from "./water.js";
 import { createFrameLoop } from "./frame-loop.js";
-import { renderSettings, framebufferSize } from "./render-policy.js";
+import { renderSettings, framebufferSize, createAdaptiveScaleController } from "./render-policy.js";
 
 const canvas = document.querySelector("#scene");
 const habitat = document.querySelector("#habitat");
@@ -27,6 +27,7 @@ if (query.get("still") === "1") paused = true;
 let onBattery = false;
 let intelGPU = false;
 let settings = renderSettings({ profile, wallpaper, pixelRatio: devicePixelRatio });
+const adaptiveScale = createAdaptiveScaleController();
 let requestedRate = prefs.frameRate;
 let loop = null, applyPower = null;
 window.habitatRate = (fps) => {
@@ -159,9 +160,9 @@ async function start() {
   backboard.position.set(0, 7, -7.2);
   backboard.receiveShadow = true;
   scene.add(backboard);
-  const { obstacles, landmarks } = await createEnvironment(scene);
   const plants = createPlants(scene, {
-    ...settings, animatedShadows: profile !== "reference",
+    ...settings, distanceLod: settings.plantDistanceLod,
+    animatedShadows: settings.animatedShadows,
     castShadows: settings.plantShadows,
   });
   const food = createFood(scene, { thickets: plants.thickets });
@@ -227,9 +228,15 @@ async function start() {
   }
   function resize() {
     const bounds = canvas.getBoundingClientRect();
-    // DPR may change when a preview moves between monitors.
-    settings = renderSettings({ profile, wallpaper, pixelRatio: devicePixelRatio, onBattery, intelGPU });
-    const dimensions = framebufferSize(bounds.width, bounds.height, Math.min(settings.resolution * prefs.renderScale / 100, Math.sqrt(4200000 / (bounds.width * bounds.height))), maxDimension);
+    const dimensions = framebufferSize(
+      bounds.width,
+      bounds.height,
+      Math.min(
+        settings.resolution * prefs.renderScale / 100 * adaptiveScale.scale,
+        Math.sqrt(4200000 / (bounds.width * bounds.height)),
+      ),
+      maxDimension,
+    );
     zeroSize = !dimensions;
     visibility();
     if (!dimensions) return;
@@ -378,7 +385,10 @@ async function start() {
     }
     if (pointer && now - lastPointerTime > 60)
       pointer.velocity.multiplyScalar(Math.exp(-dt * 12));
-    const refreshShadow = forceShadows || time - lastShadowTime + 1e-7 >= 1 / settings.shadowHz;
+    if (adaptiveScale.update(dt * 1000, profile === "fluid" && intelGPU)) resize();
+    const refreshShadow =
+      forceShadows ||
+      (settings.animatedShadows && time - lastShadowTime + 1e-7 >= 1 / settings.shadowHz);
     renderer.shadowMap.needsUpdate = refreshShadow;
     if (refreshShadow) {
       lastShadowTime = time;
@@ -408,7 +418,7 @@ async function start() {
     if (name === 'profile' || name === 'fishCount') location.reload();
     if (name === 'paused') { paused = prefs.paused; loop.setPaused(paused); }
     if (name === 'follow' && !prefs.follow) pointer = null;
-    if (name === 'renderScale') resize();
+    if (name === 'renderScale') { adaptiveScale.reset(); resize(); }
     if (name === 'light') { renderer.toneMappingExposure = prefs.light / 100 * 1.17; loop.invalidate(); }
     if (name === 'feed') window.habitatFeed();
   };
@@ -416,6 +426,7 @@ async function start() {
   for (const name of ['frameRate','paused','renderScale','light','follow']) window.stillwaterApply(name);
   window.habitatStats = () => ({
     ready, foodCount: food.pellets?.length, profile, fishCount, intelGPU, onBattery, resolution: settings.resolution,
+    adaptiveScale: adaptiveScale.scale, animatedShadows: settings.animatedShadows,
     framebuffer: [target.width, target.height], samples: target.samples, aoSamples: settings.aoSamples,
     shadowSize: settings.shadowSize,
     shadowHz: Number.isFinite(settings.shadowHz) ? settings.shadowHz : "per-frame",
