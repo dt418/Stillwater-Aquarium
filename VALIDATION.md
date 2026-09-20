@@ -46,11 +46,18 @@ and submitted triangles fell from 1,920,154 to 1,072,858 per measured frame (44.
 lower). Software rendering is deliberately slow; these figures compare revisions and
 do not predict FPS on the user's Windows GPU. See performance-baseline.json.
 
+The integrated-GPU optimization was measured on ANGLE Intel UHD Graphics 630 / D3D11:
+at 683×384 framebuffer and Fluid profile, the same synchronous benchmark fell from
+51.52 ms mean before the change to 31.42 ms after it (39.0% lower), with draw calls
+falling from 39.9 to 38. At 341×192 and a requested 60 Hz, the managed browser
+reported 53.99 FPS; this is a runtime smoke result, not a physical-monitor claim.
+
 ## Adaptive GPU-scale policy
 
-Fluid Intel adaptation uses `EXT_disjoint_timer_query_webgl2`, not display callback
-cadence, so a 30 Hz monitor cannot trigger a false downscale. The controller lowers
-scale after 30 GPU samples at or above 38 ms (about 26 service FPS) and restores it
-after 300 samples at or below 24 ms (about 42 service FPS); the asymmetric window
-prevents resize oscillation. These thresholds are policy guardrails, not physical
-FPS claims; use the opt-in diagnostics benchmark for target-device measurements.
+Fluid Intel adaptation uses asynchronous GPU timing when available and otherwise
+measures CPU render submission, not display callback cadence, so a 30 Hz monitor
+cannot trigger a false downscale. The controller lowers scale after 30 samples at or
+above 20 ms (about 50 service FPS) and restores it after 300 samples at or below
+14 ms (about 71 service FPS); the asymmetric window prevents resize oscillation.
+These thresholds are policy guardrails, not physical FPS claims; use the opt-in
+diagnostics benchmark for target-device measurements.

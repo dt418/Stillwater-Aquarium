@@ -73,7 +73,7 @@ async function start() {
   intelGPU = /intel/i.test(String(rendererName || ""));
   settings = renderSettings({ profile, wallpaper, pixelRatio: devicePixelRatio, intelGPU });
   renderer.setPixelRatio(1);
-  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.enabled = !settings.disableShadows;
   renderer.shadowMap.autoUpdate = false;
   renderer.info.autoReset = false;
   renderer.shadowMap.type = THREE.PCFShadowMap;
@@ -96,7 +96,7 @@ async function start() {
   const key = new THREE.DirectionalLight(0xfff8ee, 4.5);
   key.position.set(-3, 11.5, 4.4);
   key.target.position.set(0, 1, 0);
-  key.castShadow = true;
+  key.castShadow = !settings.disableShadows;
   key.shadow.mapSize.set(settings.shadowSize, settings.shadowSize);
   // The frustum reaches the foot of the backboard behind the right-hand bed; a fragment
   // outside the shadow map is lit as if nothing stood in front of it.
@@ -161,7 +161,9 @@ async function start() {
   backboard.position.set(0, 7, -7.2);
   backboard.receiveShadow = true;
   scene.add(backboard);
-  const { obstacles, landmarks } = await createEnvironment(scene);
+  const { obstacles, landmarks } = await createEnvironment(scene, {
+    simpleMaterials: settings.simpleMaterials,
+  });
   const plants = createPlants(scene, {
     ...settings, distanceLod: settings.plantDistanceLod,
     animatedShadows: settings.animatedShadows,
@@ -399,9 +401,6 @@ async function start() {
     if (pointer && now - lastPointerTime > 60)
       pointer.velocity.multiplyScalar(Math.exp(-dt * 12));
     const gpuMs = pollGpuTime();
-    if (gpuMs !== null &&
-        adaptiveScale.update(gpuMs, profile === "fluid" && intelGPU && Boolean(gpuTimerExt)))
-      resize();
     const refreshShadow = forceShadows || time - lastShadowTime + 1e-7 >= 1 / settings.shadowHz;
     renderer.shadowMap.needsUpdate = refreshShadow;
     if (refreshShadow) {
@@ -410,6 +409,7 @@ async function start() {
       shadowFrames++;
     }
     if (collectFrameStats) renderer.info.reset();
+    const renderStart = performance.now();
     if (gpuTimerExt && !gpuTimerQuery) {
       const queryObject = gl.createQuery();
       if (queryObject) {
@@ -426,6 +426,9 @@ async function start() {
       gl.endQuery(gpuTimerExt.TIME_ELAPSED_EXT);
       gpuTimerActive = false;
     }
+    const cpuRenderMs = performance.now() - renderStart;
+    const observedMs = gpuMs === null ? cpuRenderMs : Math.max(gpuMs, cpuRenderMs);
+    if (adaptiveScale.update(observedMs, profile === "fluid" && intelGPU)) resize();
     renderedFrames++;
     if (collectFrameStats)
       window.stillwaterMeter?.(now, { framebuffer: [target.width, target.height], calls: renderer.info.render.calls });

@@ -17,9 +17,13 @@ assert.equal(intelFluid.shadowSize, 512, 'Intel fluid mode lowers shadow-map ban
 assert.equal(intelFluid.shadowHz, 6, 'Intel fluid mode lowers shadow refresh cost');
 assert.equal(intelFluid.animatedShadows, false, 'Intel fluid mode keeps static foliage shadows');
 assert.equal(intelFluid.plantDistanceLod, true, 'Intel fluid mode enables distant plant LOD');
+assert.equal(intelFluid.simpleMaterials, true, 'Intel fluid mode simplifies foliage materials');
+assert.equal(intelFluid.disableShadows, true, 'Intel fluid mode disables shadow-map rendering');
 assert.equal(fluid.animatedShadows, true);
 assert.equal(fluid.plantDistanceLod, false);
-const adaptive = createAdaptiveScaleController({ slowFrames: 3, fastFrames: 2 });
+assert.equal(fluid.simpleMaterials, false);
+assert.equal(fluid.disableShadows, false);
+const adaptive = createAdaptiveScaleController({ slowMs: 40, fastMs: 20, slowFrames: 3, fastFrames: 2 });
 assert.equal(adaptive.update(40), false);
 assert.equal(adaptive.update(40), false);
 assert.equal(adaptive.update(40), true);
