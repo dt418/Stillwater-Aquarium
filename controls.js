@@ -1,7 +1,8 @@
 // Settings are available before the renderer starts, including early Lively callbacks.
 (()=>{
  const statsPositions=['top-left','top-right','bottom-left','bottom-right'];
- const defaults={frameRate:360,renderScale:65,light:100,follow:true,showStats:false,statsPosition:'bottom-right',paused:false};
+ const profiles=['fluid','balanced','reference'];
+ const defaults={frameRate:360,renderScale:65,light:100,profile:'fluid',follow:true,showStats:false,statsPosition:'bottom-right',paused:false};
  const prefs={...defaults};const rates=[60,120,144,165,240,360];
  function frameRateValue(value,fromLively=false){
   if(typeof value==='string'){
@@ -18,9 +19,16 @@
   if(fromLively&&Number.isInteger(n)&&n>=0&&n<statsPositions.length)return statsPositions[n];
   return defaults.statsPosition;
  }
+ function profileValue(value,fromLively=false){
+  if(typeof value==='string'&&profiles.includes(value))return value;
+  const n=Number(value);
+  if(fromLively&&Number.isInteger(n)&&n>=0&&n<profiles.length)return profiles[n];
+  return defaults.profile;
+ }
  function normalize(name,value){
   if(['follow','showStats','paused'].includes(name))return value===true||value==='true';
   if(name==='statsPosition')return statsPositionValue(value);
+  if(name==='profile')return profileValue(value);
   const n=Number(value);if(!Number.isFinite(n))return defaults[name];
   if(name==='frameRate')return frameRateValue(value);
   if(name==='renderScale')return Math.max(50,Math.min(125,n));
@@ -42,6 +50,7 @@
  window.livelyPropertyListener=(name,val)=>{
   if(name==='frameRate')val=frameRateValue(val,true);
   if(name==='statsPosition')val=statsPositionValue(val,true);
+  if(name==='profile')val=profileValue(val,true);
   window.stillwaterSet(name,val);
  };
  window.addEventListener('resize',syncTaskbarInset);

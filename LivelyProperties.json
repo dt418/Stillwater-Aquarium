@@ -12,6 +12,16 @@
       "Native refresh (max 360)"
     ]
   },
+  "profile": {
+    "type": "dropdown",
+    "value": 0,
+    "text": "Render quality",
+    "items": [
+      "Fluid - FPS priority",
+      "Balanced",
+      "Reference - maximum detail"
+    ]
+  },
   "renderScale": {
     "type": "slider",
     "min": 50,

@@ -21,8 +21,8 @@ let paused =
   matchMedia("(prefers-reduced-motion: reduce)").matches;
 const query = new URLSearchParams(location.search);
 const wallpaper = document.documentElement.dataset.motion === "host";
-const profile = "fluid";
 const prefs = window.stillwaterPreferences;
+const profile = prefs.profile || "fluid";
 if (query.get("still") === "1") paused = true;
 let onBattery = false;
 let settings = renderSettings({ profile, wallpaper, pixelRatio: devicePixelRatio });
@@ -379,6 +379,7 @@ async function start() {
   paused = prefs.paused || paused;
   window.stillwaterApply = (name) => {
     if (name === 'frameRate') window.habitatRate(prefs.frameRate);
+    if (name === 'profile') location.reload();
     if (name === 'paused') { paused = prefs.paused; loop.setPaused(paused); }
     if (name === 'follow' && !prefs.follow) pointer = null;
     if (name === 'renderScale') resize();

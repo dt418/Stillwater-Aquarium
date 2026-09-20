@@ -6,6 +6,7 @@ const defaults = {
   frameRate: 360,
   renderScale: 65,
   light: 100,
+  profile: "fluid",
   follow: true,
   showStats: false,
   statsPosition: "bottom-right",
@@ -16,7 +17,7 @@ const elementFor = (id) => {
   if (!elements.has(id)) {
     const type = id === "follow" || id === "showStats" || id === "paused"
       ? "checkbox"
-      : id === "frameRate"
+      : id === "frameRate" || id === "profile" || id === "statsPosition"
         ? "select"
         : "range";
     elements.set(id, {
@@ -65,6 +66,10 @@ context.window.stillwaterSet("statsPosition", "top-left");
 assert.equal(elements.get("stats").dataset.position, "top-left");
 context.window.livelyPropertyListener("statsPosition", 3);
 assert.equal(elements.get("stats").dataset.position, "bottom-right");
+context.window.stillwaterSet("profile", "balanced");
+assert.equal(elements.get("profile").value, "balanced");
+context.window.livelyPropertyListener("profile", 2);
+assert.equal(context.window.stillwaterPreferences.profile, "reference");
 assert.equal(typeof context.window.livelyPropertyListener, "function");
 elements.get("reload").onclick();
 assert.equal(reloads, 1);

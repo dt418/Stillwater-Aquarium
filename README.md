@@ -63,7 +63,7 @@ không được trình bày là thời gian GPU thuần.
 ## Điều khiển
 
 - Trình duyệt: nút bánh răng góc phải; Space tạm dừng, F toàn màn hình khi trang có focus.
-- Lively: Customize Wallpaper có FPS, render scale, ánh sáng, tương tác chuột,
+- Lively: Customize Wallpaper có profile Fluid (ưu tiên FPS), Balanced hoặc Reference; ngoài ra có FPS, render scale, ánh sáng, tương tác chuột,
   bộ đếm, tạm dừng và cho cá ăn.
 - Vị trí FPS có thể chọn bốn góc trong Cài đặt; mặc định là góc dưới bên phải.
 - Nút **Tải lại** trong Cài đặt hoặc **Reload wallpaper** của Lively áp dụng lại các thay đổi HTML/CSS/JS mà không cần xóa wallpaper.
