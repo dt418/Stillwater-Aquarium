@@ -1,6 +1,7 @@
 // Settings are available before the renderer starts, including early Lively callbacks.
 (()=>{
- const defaults={frameRate:360,renderScale:75,light:100,follow:true,showStats:false,paused:false};
+ const statsPositions=['top-left','top-right','bottom-left','bottom-right'];
+ const defaults={frameRate:360,renderScale:75,light:100,follow:true,showStats:false,statsPosition:'bottom-right',paused:false};
  const prefs={...defaults};const rates=[60,120,144,165,240,360];
  function frameRateValue(value,fromLively=false){
   if(typeof value==='string'){
@@ -11,19 +12,28 @@
   if(fromLively&&Number.isInteger(n)&&n>=0&&n<rates.length)return rates[n];
   return rates.includes(n)?n:defaults.frameRate;
  }
+ function statsPositionValue(value,fromLively=false){
+  if(typeof value==='string'&&statsPositions.includes(value))return value;
+  const n=Number(value);
+  if(fromLively&&Number.isInteger(n)&&n>=0&&n<statsPositions.length)return statsPositions[n];
+  return defaults.statsPosition;
+ }
  function normalize(name,value){
   if(['follow','showStats','paused'].includes(name))return value===true||value==='true';
+  if(name==='statsPosition')return statsPositionValue(value);
   const n=Number(value);if(!Number.isFinite(n))return defaults[name];
   if(name==='frameRate')return frameRateValue(value);
   if(name==='renderScale')return Math.max(50,Math.min(125,n));
   if(name==='light')return Math.max(50,Math.min(140,n));
  }
- try{const saved=JSON.parse(localStorage.getItem('stillwater3d')||'{}');for(const k in defaults)if(k in saved)prefs[k]=normalize(k,saved[k])}catch{}
+ try{const saved=JSON.parse(localStorage.getItem('stillwater3d')||'{}');if(saved&&typeof saved==='object'&&!Array.isArray(saved))for(const k in defaults)if(k in saved)prefs[k]=normalize(k,saved[k])}catch{}
  window.stillwaterPreferences=prefs;
  const panel=document.getElementById('panel'),stats=document.getElementById('stats');
- function sync(){for(const key in prefs){const e=document.getElementById(key);if(!e)continue;if(e.type==='checkbox')e.checked=prefs[key];else e.value=String(prefs[key]);const out=document.getElementById(key+'Value');if(out)out.textContent=prefs[key]+'%'}const rate=document.getElementById('frameRateStatus');if(rate)rate.textContent=prefs.frameRate===360?'Theo màn hình':`${prefs.frameRate} FPS`;stats.hidden=!prefs.showStats;document.getElementById('pause').textContent=prefs.paused?'Tiếp tục':'Tạm dừng';if(prefs.paused)stats.textContent='Đã tạm dừng';}
+ function syncTaskbarInset(){const display=window.screen;const taskbar=display&&Number.isFinite(display.height)&&Number.isFinite(display.availHeight)?Math.max(0,display.height-display.availHeight):0;document.documentElement.style.setProperty('--stats-bottom',`${20+taskbar}px`);}
+ function sync(){for(const key in prefs){const e=document.getElementById(key);if(!e)continue;if(e.type==='checkbox')e.checked=prefs[key];else e.value=String(prefs[key]);const out=document.getElementById(key+'Value');if(out)out.textContent=prefs[key]+'%'}stats.dataset.position=prefs.statsPosition;const rate=document.getElementById('frameRateStatus');if(rate)rate.textContent=prefs.frameRate===360?'Theo màn hình':`${prefs.frameRate} FPS`;stats.hidden=!prefs.showStats;document.getElementById('pause').textContent=prefs.paused?'Tiếp tục':'Tạm dừng';if(prefs.paused)stats.textContent='Đã tạm dừng';}
  window.stillwaterSet=(name,value)=>{
   if(name==='feed'){window.stillwaterApply?.('feed');return}
+  if(name==='reload'){location.reload();return}
   if(!(name in defaults))return;
   prefs[name]=normalize(name,value);sync();
   try{localStorage.setItem('stillwater3d',JSON.stringify(prefs))}catch{}
@@ -31,12 +41,16 @@
  };
  window.livelyPropertyListener=(name,val)=>{
   if(name==='frameRate')val=frameRateValue(val,true);
+  if(name==='statsPosition')val=statsPositionValue(val,true);
   window.stillwaterSet(name,val);
  };
+ window.addEventListener('resize',syncTaskbarInset);
+ syncTaskbarInset();
  for(const key in defaults){const e=document.getElementById(key);if(!e)continue;const event=e.tagName==='SELECT'||e.type==='checkbox'?'change':'input';e.addEventListener(event,()=>window.stillwaterSet(key,e.type==='checkbox'?e.checked:e.value))}
  document.getElementById('settings').onclick=()=>panel.showModal();
  document.getElementById('close').onclick=()=>panel.close();
  document.getElementById('feed').onclick=()=>window.stillwaterSet('feed');
+ document.getElementById('reload').onclick=()=>location.reload();
  document.getElementById('pause').onclick=()=>window.stillwaterSet('paused',!prefs.paused);
  document.getElementById('reset').onclick=()=>{for(const key in defaults)window.stillwaterSet(key,defaults[key])};
  let last=null,start=null,count=0,frames=0;const intervals=new Float64Array(720);let index=0;

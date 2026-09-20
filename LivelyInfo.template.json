@@ -1,0 +1,14 @@
+{
+  "AppVersion": "2.0.0",
+  "Title": "Stillwater 2 — Living Riverscape",
+  "Thumbnail": "preview.png",
+  "Preview": "preview.png",
+  "Desc": "Offline 3D aquarium riverscape for Lively Wallpaper with high-refresh rendering and interactive fish.",
+  "Author": "dt418",
+  "License": "MIT; adapted from Desktop Habitats",
+  "Contact": "https://github.com/dt418/Stillwater-Aquarium",
+  "Type": 1,
+  "FileName": "index.html",
+  "Arguments": null,
+  "IsAbsolutePath": false
+}

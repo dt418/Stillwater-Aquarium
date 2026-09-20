@@ -38,6 +38,17 @@
     "value": false,
     "text": "Show measured FPS"
   },
+  "statsPosition": {
+    "type": "dropdown",
+    "value": 3,
+    "text": "FPS position",
+    "items": [
+      "Top left",
+      "Top right",
+      "Bottom left",
+      "Bottom right"
+    ]
+  },
   "paused": {
     "type": "checkbox",
     "value": false,
@@ -47,5 +58,10 @@
     "type": "button",
     "value": "Feed",
     "text": "Feed fish"
+  },
+  "reload": {
+    "type": "button",
+    "value": "Reload",
+    "text": "Reload wallpaper"
   }
 }

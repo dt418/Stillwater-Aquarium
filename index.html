@@ -7,7 +7,8 @@
 <label for="renderScale">Độ phân giải dựng hình <output id="renderScaleValue"></output></label><input type="range" id="renderScale" min="50" max="125" step="5">
 <label for="light">Ánh sáng <output id="lightValue"></output></label><input type="range" id="light" min="50" max="140" step="5">
 <label for="follow">Cá phản ứng với chuột<input type="checkbox" id="follow"></label><label for="showStats">Hiện FPS thực tế<input type="checkbox" id="showStats"></label>
+<label for="statsPosition">Vị trí FPS<select id="statsPosition"><option value="top-left">Trên trái</option><option value="top-right">Trên phải</option><option value="bottom-left">Dưới trái</option><option value="bottom-right" selected>Dưới phải</option></select></label>
 <p class="note">FPS thực tế phụ thuộc GPU, màn hình và trình phát. Giảm độ phân giải dựng hình nếu chuyển động chưa mượt.</p>
-<div class="actions"><button id="feed">Cho cá ăn</button><button id="pause">Tạm dừng</button></div><footer><button id="reset">Mặc định</button><button id="close">Trở về bể cá</button></footer>
+<div class="actions"><button id="feed">Cho cá ăn</button><button id="pause">Tạm dừng</button></div><footer><button id="reset">Mặc định</button><button id="reload">Tải lại</button><button id="close">Trở về bể cá</button></footer>
 <p class="credit">Adapted from Desktop Habitats · Chase Lean<br>Three.js · Poly Haven textures</p></dialog>
 <script src="controls.js"></script><script src="aquarium.js"></script></body></html>

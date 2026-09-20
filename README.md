@@ -12,7 +12,9 @@ Bản nâng cấp sử dụng cảnh Riverscape từ Desktop Habitats của Chas
 2. Giải nén toàn bộ gói vào một thư mục cố định, ví dụ Pictures\Stillwater.
 3. Trong Lively, chọn Add Wallpaper → Choose a file → chọn **index.html** ở thư mục gốc.
 4. Áp dụng wallpaper. Nhấp phải tile → Customize Wallpaper để chỉnh các tùy chọn.
-5. Có thể mở index.html trực tiếp bằng Edge/Chrome để xem thử. Không cần Node.js,
+5. Metadata Lively nằm trong `LivelyInfo.json`; hãy dùng Add Wallpaper để import thư mục này, không dùng Create New Project.
+Lưu ý: các bản đã import trước đó không tự biến mất; hãy xóa tile trong Lively hoặc đóng Lively rồi xóa bản sao Stillwater trong `%LOCALAPPDATA%\Lively Wallpaper\Library\wallpapers`.
+6. Có thể mở index.html trực tiếp bằng Edge/Chrome để xem thử. Không cần Node.js,
    npm, server, Rive, quyền Administrator hoặc mạng sau khi đã tải gói.
 
 Nếu dùng bản cũ, thêm bản mới như một wallpaper mới: cấu trúc và tùy chọn đã thay đổi.
@@ -63,6 +65,8 @@ không được trình bày là thời gian GPU thuần.
 - Trình duyệt: nút bánh răng góc phải; Space tạm dừng, F toàn màn hình khi trang có focus.
 - Lively: Customize Wallpaper có FPS, render scale, ánh sáng, tương tác chuột,
   bộ đếm, tạm dừng và cho cá ăn.
+- Vị trí FPS có thể chọn bốn góc trong Cài đặt; mặc định là góc dưới bên phải.
+- Nút **Tải lại** trong Cài đặt hoặc **Reload wallpaper** của Lively áp dụng lại các thay đổi HTML/CSS/JS mà không cần xóa wallpaper.
 - Bộ chọn FPS chấp nhận cả chỉ số dropdown của Lively, giá trị số và nhãn như
   `165 FPS`; dòng “Đang áp dụng” xác nhận ngay mức mục tiêu.
 - Khi tab ẩn/tạm dừng, vòng dựng hình ngừng lên lịch. Tùy chọn cục bộ được nhớ;
