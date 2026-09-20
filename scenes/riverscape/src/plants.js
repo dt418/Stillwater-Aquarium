@@ -161,7 +161,7 @@ export function createPlants(scene, {
     },
     detail(z) {
       if (!distanceLod) return null;
-      const far = smoothstep(-1.3, -5.7, z);
+      const far = 1 - smoothstep(-5.7, -1.3, z);
       return {
         rows: Math.max(4, Math.round(this.rows * (1 - 0.25 * far))),
         cols: Math.max(2, Math.round(this.cols * (1 - 0.33 * far))),

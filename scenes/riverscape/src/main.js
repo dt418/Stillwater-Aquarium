@@ -160,6 +160,7 @@ async function start() {
   backboard.position.set(0, 7, -7.2);
   backboard.receiveShadow = true;
   scene.add(backboard);
+  const { obstacles, landmarks } = await createEnvironment(scene);
   const plants = createPlants(scene, {
     ...settings, distanceLod: settings.plantDistanceLod,
     animatedShadows: settings.animatedShadows,
@@ -228,6 +229,7 @@ async function start() {
   }
   function resize() {
     const bounds = canvas.getBoundingClientRect();
+    settings = renderSettings({ profile, wallpaper, pixelRatio: devicePixelRatio, onBattery, intelGPU });
     const dimensions = framebufferSize(
       bounds.width,
       bounds.height,
@@ -386,9 +388,7 @@ async function start() {
     if (pointer && now - lastPointerTime > 60)
       pointer.velocity.multiplyScalar(Math.exp(-dt * 12));
     if (adaptiveScale.update(dt * 1000, profile === "fluid" && intelGPU)) resize();
-    const refreshShadow =
-      forceShadows ||
-      (settings.animatedShadows && time - lastShadowTime + 1e-7 >= 1 / settings.shadowHz);
+    const refreshShadow = forceShadows || time - lastShadowTime + 1e-7 >= 1 / settings.shadowHz;
     renderer.shadowMap.needsUpdate = refreshShadow;
     if (refreshShadow) {
       lastShadowTime = time;
